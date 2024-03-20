@@ -39,8 +39,8 @@ const RegistrationPage = () => {
         } else if(!/^[a-zA-Z0-9]+$/.test(formData.password)) {
             validationErrors.password = "Пароль должен содержать только латиницу и цифры";
         }
-        else if(!/^[a-zA-Z0-9]+$/.test(formData.email)) {
-            validationErrors.email = "Email должен содержать только латиницу и цифры";
+        else if (!/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(formData.email)) {
+            validationErrors.email = "Email должен содержать только латинские буквы и цифры";
         }
 
         if(formData.confirmPassword !== formData.password) {
