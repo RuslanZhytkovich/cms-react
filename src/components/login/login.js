@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import './register-styles.css';
+import './login.css';
 
-const Registration = () => {
+const Login = () => {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
-        confirmPassword: ''
     });
-
     const [errors, setErrors] = useState({});
-    const [errorMessage, setErrorMessage] = useState('');
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -19,55 +17,47 @@ const Registration = () => {
         });
 
         setErrors({});
-        setErrorMessage('');
+
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const validationErrors = {};
 
-        if(!formData.email.trim()) {
+        if (!formData.email.trim()) {
             validationErrors.email = "Обязательное поле";
-        } else if(!/\S+@\S+\.\S+/.test(formData.email)){
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
             validationErrors.email = "Некорректный email";
         }
 
-        if(!formData.password.trim()) {
+        if (!formData.password.trim()) {
             validationErrors.password = "Обязательное поле";
-        } else if(formData.password.length < 6){
+        } else if (formData.password.length < 6) {
             validationErrors.password = "Пароль должен быть более 6 символов";
-        } else if(!/^[a-zA-Z0-9]+$/.test(formData.password)) {
+        } else if (!/^[a-zA-Z0-9]+$/.test(formData.password)) {
             validationErrors.password = "Пароль должен содержать только латиницу и цифры";
-        }
-        else if (!/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(formData.email)) {
-            validationErrors.email = "Email должен содержать только латинские буквы и цифры";
-        }
-
-        if(formData.confirmPassword !== formData.password) {
-            validationErrors.confirmPassword = "Пароли не совпадают";
         }
 
         setErrors(validationErrors);
 
         if (Object.keys(validationErrors).length === 0) {
             try {
-                const response = await fetch('http://127.0.0.1:8000/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: formData.email,
-                        password: formData.password
-                    }),
-                });
+                const formDataToSend = new FormData();
+                formDataToSend.append('username', formData.email);
+                formDataToSend.append('password', formData.password);
 
-                if (response.ok) {
-                    setErrorMessage(''); // Очистить сообщение об ошибке
-                    alert('Успешно отправлено');
+                const requestOptions = {
+                    method: "POST",
+                    body: formDataToSend
+                };
+
+                const response = await fetch("http://127.0.0.1:8000/login/token", requestOptions);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    console.log('not ok(')
                 } else {
-                    const responseData = await response.json();
-                    setErrorMessage(responseData.detail);
+                    alert(data['access_token']) // Выводим access_token
                 }
             } catch (error) {
                 console.error('Ошибка:', error);
@@ -79,6 +69,7 @@ const Registration = () => {
     return (
         <form onSubmit={handleSubmit}>
             <div>
+                <h1>Login</h1>
                 <label>Email:</label>
                 <input
                     name="email"
@@ -99,20 +90,10 @@ const Registration = () => {
                 />
                 {errors.password && <span>{errors.password}</span>}
             </div>
-            <div>
-                <label>Повтор пароля:</label>
-                <input
-                    type="password"
-                    name="confirmPassword"
-                    placeholder='******'
-                    onChange={handleChange}
-                />
-                {errors.confirmPassword && <span>{errors.confirmPassword}</span>}
-            </div>
-            {errorMessage && <div className="error-message">{errorMessage}</div>}
+
             <button type="submit">Подтвердить</button>
         </form>
     );
 };
 
-export default Registration;
+export default Login;
