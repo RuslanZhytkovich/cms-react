@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, {useContext, useState} from 'react';
 import './login.css';
+import {setAccessTokenToLocalStorage, setRefreshTokenToCookie, setToken} from "../Auth";
+import {useNavigate} from "react-router-dom";
+
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -7,7 +10,7 @@ const Login = () => {
         password: '',
     });
     const [errors, setErrors] = useState({});
-
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -57,7 +60,10 @@ const Login = () => {
                 if (!response.ok) {
                     console.log('not ok(')
                 } else {
-                    alert(data['access_token']) // Выводим access_token
+                    setRefreshTokenToCookie(data['refresh_token']);
+                    setAccessTokenToLocalStorage(data['access_token'])
+
+                    navigate('/home');
                 }
             } catch (error) {
                 console.error('Ошибка:', error);
@@ -97,3 +103,5 @@ const Login = () => {
 };
 
 export default Login;
+
+
