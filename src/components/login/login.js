@@ -1,6 +1,6 @@
-import React, {useContext, useState} from 'react';
+import React, { useState } from 'react';
 import './login.css';
-import {setAccessTokenToLocalStorage, setRefreshTokenToCookie, setToken} from "../Auth";
+import {setAccessTokenToLocalStorage, setRefreshTokenToCookie} from "../Auth";
 import {useNavigate} from "react-router-dom";
 
 
@@ -58,6 +58,7 @@ const Login = () => {
                 const data = await response.json();
 
                 if (!response.ok) {
+                    console.log("11111_" + response.status)
                     console.log('not ok(')
                 } else {
                     setRefreshTokenToCookie(data['refresh_token']);

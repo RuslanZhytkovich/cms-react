@@ -9,21 +9,49 @@ export const setAccessTokenToLocalStorage = (token) => {
     localStorage.setItem('accessToken', token);
 }
 
+function getCookie(name) {
+    const fullCookieString = '; ' + document.cookie;
+    const splitCookie = fullCookieString.split('; ' + name + '=');
+    return splitCookie.length === 2 ? splitCookie.pop().split(';').shift() : null;
+}
+
 export const fetchToken = async () => {
     const accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
         return false;
     }
 
-    const requestOptions = {
+    const requestAccessOptions = {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${accessToken}`
         }
     };
 
+    const formDataToSend = new FormData();
+    formDataToSend.append('refresh_token', getCookie('refreshToken'));
+
+    const requestRefreshOptions = {
+        method: 'POST',
+        body: formDataToSend
+    };
+
     try {
-        const response = await fetch('http://127.0.0.1:8000/login/test_auth_endpoint', requestOptions);
+        const response = await fetch('http://127.0.0.1:8000/login/test_auth_endpoint', requestAccessOptions);
+        if (response.status === 401) {
+            console.log("401");
+
+            const response2 = await fetch('http://127.0.0.1:8000/login/token/refresh', requestRefreshOptions);
+            if (response2.ok) {
+                const data = await response2.json();
+                setAccessTokenToLocalStorage(data['access_token']);
+                // Вызываем fetchToken снова, чтобы проверить токен после обновления
+                return fetchToken();
+            } else {
+                console.error('Failed to refresh token');
+                return false;
+            }
+        }
         return response.status === 200;
     } catch (error) {
         console.error('Error fetching token:', error);
@@ -44,12 +72,11 @@ export function RequireToken({ children }) {
     }, []);
 
     if (auth === null) {
-        // Пока выполняется запрос, отображаем заглушку
         return <div>Loading...</div>;
     }
 
+
     if (!auth) {
-        // Если запрос не был успешным или нет токена, перенаправляем на страницу входа
         return <Navigate to="/" state={{ from: location }} />;
     }
 
