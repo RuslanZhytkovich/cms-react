@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './login.css';
-import {setAccessTokenToLocalStorage, setRefreshTokenToCookie} from "../Auth";
+import {setAccessTokenToLocalStorage, setRefreshTokenToCookie} from "../../auth/Auth";
 import {useNavigate} from "react-router-dom";
 
 

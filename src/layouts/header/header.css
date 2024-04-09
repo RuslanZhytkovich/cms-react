@@ -1,0 +1,42 @@
+.header-container {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+}
+
+.nav-list {
+    list-style-type: none;
+    display: flex;
+    justify-content: flex-start; /* Изменено на flex-start для выравнивания слева */
+    align-items: center;
+    padding: 0;
+}
+
+.nav-list li {
+    margin-right: 30px;
+}
+
+.nav-list a,
+.nav-list button {
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    background: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-list a:hover,
+.nav-list button:hover {
+    color: #ff4500; /* Изменение цвета при наведении */
+}
+
+button {
+    cursor: pointer;
+}
+
+/* Пример анимации для кнопки Logout */
+button:hover {
+    transform: scale(1.1); /* Увеличение размера кнопки при наведении */
+}

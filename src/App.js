@@ -1,12 +1,15 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Registration from './components/registration/register';
-import Login from './components/login/login';
-import NotFound from './components/errors/NotFound';
-import { RequireToken } from './components/Auth.js';
-import Home from './components/home';
-import Projects from './components/projects';
-import Header from "./components/header"; // Подключаем компонент Projects
+import Login from "./layouts/login/login";
+import Registration from "./layouts/registration/register";
+import NotFound from "./layouts/errors/NotFound";
+import {RequireToken} from "./auth/Auth";
+import Header from "./layouts/header/header";
+import Customer from "./layouts/customer/customer";
+import Account from "./layouts/account/account";
+import Home from "./layouts/home/home";
+import Project from "./layouts/project/project";
+
 
 function App() {
     return (
@@ -17,7 +20,9 @@ function App() {
                     <Route path="/register" element={<Registration />} />
                     <Route path="*" element={<NotFound />} />
                     <Route path="/home" element={<RequireToken><Header /><Home /></RequireToken>} />
-                    <Route path="/projects" element={<RequireToken><Header /><Projects /></RequireToken>} /> {}
+                    <Route path="/customers" element={<RequireToken><Header /><Customer /></RequireToken>} />
+                    <Route path="/account" element={<RequireToken><Header /><Account /></RequireToken>} />
+                    <Route path="/projects" element={<RequireToken><Header /><Project /></RequireToken>} /> {}
                 </Routes>
             </div>
         </BrowserRouter>
