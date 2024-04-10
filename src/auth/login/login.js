@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './login.css';
-import {setAccessTokenToLocalStorage, setRefreshTokenToCookie} from "../../auth/Auth";
+import {setAccessTokenToLocalStorage, setRefreshTokenToCookie} from "../Auth";
 import {useNavigate} from "react-router-dom";
 
 
@@ -76,7 +76,7 @@ const Login = () => {
     return (
         <form onSubmit={handleSubmit}>
             <div>
-                <h1>Login</h1>
+                <h1>Вход в систему</h1>
                 <label>Email:</label>
                 <input
                     name="email"

@@ -3,10 +3,47 @@ import './Home.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPenSquare, faPlus } from '@fortawesome/free-solid-svg-icons'; // Иконки удаления, редактирования и добавления
 
+const Modal = ({ children, closeModal }) => {
+    return (
+        <div className="modal">
+            <div className="modal-content">
+                <span className="close" onClick={closeModal}>&times;</span>
+                {children}
+            </div>
+        </div>
+    );
+};
+
 const Home = () => {
     const [reports, setReports] = useState([]);
     const [accessToken, setAccessToken] = useState('');
     const [loading, setLoading] = useState(true);
+    const [projectNames, setProjectNames] = useState({});
+    const [showModal, setShowModal] = useState(false);
+    const [formData, setFormData] = useState({
+        date: '',
+        hours: '',
+        comment: '',
+        project_id: ''
+    });
+
+    const getProjectName = async (projectId) => {
+        try {
+            const response = await fetch(`http://localhost:8000/projects/get_by_id/${projectId}`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                return data.project_name;
+            } else {
+                console.error('Ошибка при получении имени проекта:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Ошибка при выполнении запроса:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchAccessToken = async () => {
@@ -51,6 +88,23 @@ const Home = () => {
         }
     }, [accessToken]);
 
+    useEffect(() => {
+        const fetchProjectNames = async () => {
+            const names = {};
+            for (const report of reports) {
+                if (!projectNames[report.project_id]) {
+                    const projectName = await getProjectName(report.project_id);
+                    names[report.project_id] = projectName;
+                }
+            }
+            setProjectNames(names);
+        };
+
+        if (reports.length > 0) {
+            fetchProjectNames();
+        }
+    }, [reports]);
+
     // Обработчик для удаления отчета
     const handleDeleteReport = (index) => {
         // Реализуйте логику удаления отчета по индексу
@@ -61,9 +115,56 @@ const Home = () => {
         // Реализуйте логику редактирования отчета по индексу
     };
 
-    // Обработчик для создания нового отчета
-    const handleCreateReport = () => {
-        // Реализуйте логику создания нового отчета
+    // Обработчик для открытия модального окна
+    const handleOpenModal = () => {
+        setShowModal(true);
+    };
+
+    // Обработчик для закрытия модального окна
+    const handleCloseModal = () => {
+        setShowModal(false);
+    };
+
+    // Обработчик для отправки формы
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        // Валидация часов от 0 до 24
+        const hours = parseInt(formData.hours);
+        if (hours < 0 || hours > 24) {
+            alert('Пожалуйста, введите количество часов от 0 до 24.');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:8000/reports/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify(formData)
+            });
+            if (response.ok) {
+                // Успешно создан отчет
+                // После успешного создания отчета можно сбросить форму или выполнить другие действия
+                console.log('Отчет успешно создан');
+                handleCloseModal(); // Закрываем модальное окно после успешного создания отчета
+                window.location.reload(); // Обновляем страницу
+            } else {
+                console.error('Ошибка при создании отчета:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Ошибка при выполнении запроса:', error);
+        }
+    };
+
+    // Обработчик изменения значений формы
+    const handleChange = (event) => {
+        setFormData({
+            ...formData,
+            [event.target.name]: event.target.value
+        });
     };
 
     if (loading) {
@@ -75,7 +176,7 @@ const Home = () => {
             <div>
                 <h2>Главная!</h2>
                 <p>Отчетов нету</p>
-                <button onClick={handleCreateReport}>Сделать отчет <FontAwesomeIcon icon={faPlus}/></button>
+                <button onClick={handleOpenModal}>Сделать отчет <FontAwesomeIcon icon={faPlus}/></button>
             </div>
         );
     }
@@ -84,14 +185,37 @@ const Home = () => {
         <div>
             <h2>Главная!</h2>
             <p>Мои отчеты!</p>
-            <button onClick={handleCreateReport}>Сделать отчет <FontAwesomeIcon icon={faPlus}/></button>
+            <button onClick={handleOpenModal}>Сделать отчет <FontAwesomeIcon icon={faPlus}/></button>
+            {showModal && (
+                <Modal closeModal={handleCloseModal}>
+                    <form onSubmit={handleSubmit}>
+                        <label>
+                            Дата:
+                            <input type="text" name="date" value={formData.date} onChange={handleChange} />
+                        </label>
+                        <label>
+                            Часы:
+                            <input type="number" name="hours" value={formData.hours} onChange={handleChange} min="0" max="24" />
+                        </label>
+                        <label>
+                            Комментарий:
+                            <input type="text" name="comment" value={formData.comment} onChange={handleChange} />
+                        </label>
+                        <label>
+                            Проект ID:
+                            <input type="text" name="project_id" value={formData.project_id} onChange={handleChange} />
+                        </label>
+                        <button type="submit">Отправить</button>
+                    </form>
+                </Modal>
+            )}
             <table className="table">
                 <thead>
                 <tr>
                     <th>Дата</th>
                     <th>Часы</th>
                     <th>Комментарий</th>
-                    <th>Проект ID</th>
+                    <th>Проект</th>
                     <th>Действие</th>
                 </tr>
                 </thead>
@@ -101,7 +225,7 @@ const Home = () => {
                         <td>{report.date}</td>
                         <td>{report.hours}</td>
                         <td>{report.comment}</td>
-                        <td>{report.project_id}</td>
+                        <td>{projectNames[report.project_id]}</td>
                         <td className="icon-container">
                             <FontAwesomeIcon
                                 className="icon"
