@@ -26,6 +26,7 @@ const Home = () => {
         comment: '',
         project_id: ''
     });
+    const [allProjects, setAllProjects] = useState([]);
 
     const getProjectName = async (projectId) => {
         try {
@@ -39,6 +40,24 @@ const Home = () => {
                 return data.project_name;
             } else {
                 console.error('Ошибка при получении имени проекта:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Ошибка при выполнении запроса:', error);
+        }
+    };
+
+    const getAllProjects = async () => {
+        try {
+            const response = await fetch('http://localhost:8000/projects/get_all', {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setAllProjects(data);
+            } else {
+                console.error('Ошибка при получении списка проектов:', response.statusText);
             }
         } catch (error) {
             console.error('Ошибка при выполнении запроса:', error);
@@ -104,6 +123,12 @@ const Home = () => {
             fetchProjectNames();
         }
     }, [reports]);
+
+    useEffect(() => {
+        if (showModal) {
+            getAllProjects();
+        }
+    }, [showModal]);
 
     // Обработчик для удаления отчета
     const handleDeleteReport = (index) => {
@@ -202,8 +227,13 @@ const Home = () => {
                             <input type="text" name="comment" value={formData.comment} onChange={handleChange} />
                         </label>
                         <label>
-                            Проект ID:
-                            <input type="text" name="project_id" value={formData.project_id} onChange={handleChange} />
+                            Проект:
+                            <select name="project_id" value={formData.project_id} onChange={handleChange}>
+                                <option value="">Выберите проект</option>
+                                {allProjects.map((project) => (
+                                    <option key={project.id} value={project.id}>{project.name}</option>
+                                ))}
+                            </select>
                         </label>
                         <button type="submit">Отправить</button>
                     </form>
