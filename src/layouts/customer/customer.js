@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPenSquare, faPlus } from '@fortawesome/free-solid-svg-icons'; // Иконки удаления, редактирования и добавления
 
@@ -77,6 +77,7 @@ const Customer = () => {
             });
             if (response.ok) {
                 console.log('Заказчик успешно удален');
+                window.location.reload(); // Перезагружаем страницу после успешного удаления
             } else {
                 console.error('Ошибка при удалении заказчика:', response.statusText);
             }
@@ -116,6 +117,7 @@ const Customer = () => {
             if (response.ok) {
                 console.log('Заказчик успешно создан');
                 handleCloseModal(); // Закрываем модальное окно после успешного создания заказчика
+                window.location.reload(); // Перезагружаем страницу после успешного создания
             } else {
                 console.error('Ошибка при создании заказчика:', response.statusText);
             }

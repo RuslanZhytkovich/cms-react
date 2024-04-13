@@ -154,7 +154,6 @@ const Home = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // Валидация часов от 0 до 24
         const hours = parseInt(formData.hours);
         if (hours < 0 || hours > 24) {
             alert('Пожалуйста, введите количество часов от 0 до 24.');
@@ -186,11 +185,13 @@ const Home = () => {
 
     // Обработчик изменения значений формы
     const handleChange = (event) => {
+        const { name, value } = event.target;
         setFormData({
             ...formData,
-            [event.target.name]: event.target.value
+            [name]: value
         });
     };
+
 
     if (loading) {
         return <p>Загрузка...</p>;
@@ -231,9 +232,13 @@ const Home = () => {
                             <select name="project_id" value={formData.project_id} onChange={handleChange}>
                                 <option value="">Выберите проект</option>
                                 {allProjects.map((project) => (
-                                    <option key={project.id} value={project.id}>{project.name}</option>
+                                    <option key={project.id} value={project.id}>{project.project_name}</option>
                                 ))}
                             </select>
+                        </label>
+                        <label>
+                            ID проекта:
+                            <input type="text" name="project_id" value={formData.project_id} onChange={handleChange} />
                         </label>
                         <button type="submit">Отправить</button>
                     </form>

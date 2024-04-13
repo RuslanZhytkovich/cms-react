@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './register-styles.css';
+import { useNavigate } from "react-router-dom";
 
 const Registration = () => {
     const [formData, setFormData] = useState({
@@ -10,6 +11,8 @@ const Registration = () => {
 
     const [errors, setErrors] = useState({});
     const [errorMessage, setErrorMessage] = useState('');
+
+    const navigate = useNavigate(); // Перемещаем хук за пределы компонента
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -63,11 +66,11 @@ const Registration = () => {
                 });
 
                 if (response.ok) {
-                    setErrorMessage(''); // Очистить сообщение об ошибке
-                    alert('Успешно отправлено');
-                } else {
+                    setErrorMessage('');
+                    navigate('/'); // Используем navigate для перехода на главную страницу
+                } else if (response.status === 409) {
                     const responseData = await response.json();
-                    setErrorMessage(responseData.detail);
+                    setErrorMessage(responseData.detail); // Вывести сообщение о существующем пользователе
                 }
             } catch (error) {
                 console.error('Ошибка:', error);
