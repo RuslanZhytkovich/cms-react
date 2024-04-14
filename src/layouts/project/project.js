@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPenSquare, faPlus } from '@fortawesome/free-solid-svg-icons';
 
-
 const Modal = ({ children, closeModal }) => {
     return (
         <div className="modal">
@@ -26,6 +25,7 @@ const Project = () => {
         customer_id: '',
         is_deleted: false,
     });
+    const [editingProjectId, setEditingProjectId] = useState(null);
 
     useEffect(() => {
         const fetchAccessToken = async () => {
@@ -80,6 +80,8 @@ const Project = () => {
                 }
             });
             if (response.ok) {
+                console.log('Проект успешно удален');
+                window.location.reload(); // Перезагружаем страницу после успешного удаления
             } else {
                 console.error('Ошибка при удалении проекта:', response.statusText);
             }
@@ -90,7 +92,16 @@ const Project = () => {
 
     // Обработчик для редактирования проекта
     const handleEditProject = (projectId) => {
-        // Реализуйте логику редактирования проекта
+        setEditingProjectId(projectId);
+        const projectToEdit = projects.find(project => project.id === projectId);
+        setFormData({
+            project_name: projectToEdit.project_name,
+            start_date: projectToEdit.start_date,
+            end_date: projectToEdit.end_date,
+            customer_id: projectToEdit.customer_id,
+            is_deleted: projectToEdit.is_deleted,
+        });
+        setShowModal(true);
     };
 
     // Обработчик для открытия модального окна
@@ -107,23 +118,46 @@ const Project = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        try {
-            const response = await fetch('http://localhost:8000/projects/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`
-                },
-                body: JSON.stringify(formData)
-            });
-            if (response.ok) {
-                console.log('Проект успешно создан');
-                handleCloseModal(); // Закрываем модальное окно после успешного создания проекта
-            } else {
-                console.error('Ошибка при создании проекта:', response.statusText);
+        if (editingProjectId) {
+            try {
+                const response = await fetch(`http://localhost:8000/projects/update/${editingProjectId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+                if (response.ok) {
+                    console.log('Проект успешно обновлен');
+                    handleCloseModal(); // Закрываем модальное окно после успешного обновления
+                    window.location.reload(); // Перезагружаем страницу после успешного обновления
+                } else {
+                    console.error('Ошибка при обновлении проекта:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Ошибка при выполнении запроса:', error);
             }
-        } catch (error) {
-            console.error('Ошибка при выполнении запроса:', error);
+        } else {
+            try {
+                const response = await fetch('http://localhost:8000/projects/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+                if (response.ok) {
+                    console.log('Проект успешно создан');
+                    handleCloseModal(); // Закрываем модальное окно после успешного создания
+                    window.location.reload(); // Перезагружаем страницу после успешного создания
+                } else {
+                    console.error('Ошибка при создании проекта:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Ошибка при выполнении запроса:', error);
+            }
         }
     };
 
@@ -152,10 +186,26 @@ const Project = () => {
                             <input type="text" name="project_name" value={formData.project_name} onChange={handleChange} />
                         </label>
                         <label>
+                            Начало проекта:
+                            <input type="date" name="start_date" value={formData.start_date} onChange={handleChange} />
+                        </label>
+                        <label>
+                            Конец проекта:
+                            <input type="date" name="end_date" value={formData.end_date} onChange={handleChange} />
+                        </label>
+                        <label>
+                            ID заказчика:
+                            <input type="text" name="customer_id" value={formData.customer_id} onChange={handleChange} />
+                        </label>
+                        <label>
                             Удален ли:
                             <input type="checkbox" name="is_deleted" checked={formData.is_deleted} onChange={handleChange} />
                         </label>
-                        <button type="submit">Отправить</button>
+                        {editingProjectId ? (
+                            <button onClick={handleSubmit}>Сохранить изменения</button>
+                        ) : (
+                            <button type="submit">Добавить проект</button>
+                        )}
                     </form>
                 </Modal>
             )}
@@ -165,7 +215,7 @@ const Project = () => {
                     <th>Название проекта</th>
                     <th>Начало проекта</th>
                     <th>Конец проекта</th>
-                    <th>Заказчик</th>
+                    <th>ID заказчика</th>
                     <th>Действие</th>
                 </tr>
                 </thead>
@@ -176,8 +226,6 @@ const Project = () => {
                         <td>{project.start_date}</td>
                         <td>{project.end_date}</td>
                         <td>{project.customer_id}</td>
-
-
                         <td className="icon-container">
                             <FontAwesomeIcon
                                 className="icon"

@@ -22,6 +22,7 @@ const Customer = () => {
         customer_name: '',
         is_deleted: false,
     });
+    const [editingCustomerId, setEditingCustomerId] = useState(null);
 
     useEffect(() => {
         const fetchAccessToken = async () => {
@@ -69,17 +70,21 @@ const Customer = () => {
     // Обработчик для удаления заказчика
     const handleDeleteCustomer = async (customerId) => {
         try {
-            const response = await fetch(`http://localhost:8000/customers/delete/${customerId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
+            const customerToDelete = customers.find(c => c.customer_id === customerId);
+            const confirmDelete = window.confirm(`Вы точно хотите удалить заказчика с именем: ${customerToDelete.customer_name}`);
+            if (confirmDelete) {
+                const response = await fetch(`http://localhost:8000/customers/soft_delete/${customerId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                if (response.ok) {
+                    console.log('Заказчик успешно удален');
+                    window.location.reload(); // Перезагружаем страницу после успешного удаления
+                } else {
+                    console.error('Ошибка при удалении заказчика:', response.statusText);
                 }
-            });
-            if (response.ok) {
-                console.log('Заказчик успешно удален');
-                window.location.reload(); // Перезагружаем страницу после успешного удаления
-            } else {
-                console.error('Ошибка при удалении заказчика:', response.statusText);
             }
         } catch (error) {
             console.error('Ошибка при выполнении запроса:', error);
@@ -88,7 +93,47 @@ const Customer = () => {
 
     // Обработчик для редактирования заказчика
     const handleEditCustomer = (customerId) => {
-        // Реализуйте логику редактирования заказчика
+        setEditingCustomerId(customerId);
+        const customerToEdit = customers.find(customer => customer.customer_id === customerId);
+        setFormData({
+            customer_name: customerToEdit.customer_name,
+            is_deleted: customerToEdit.is_deleted,
+        });
+        setShowModal(true);
+    };
+
+    // Обработчик для отмены редактирования
+    const cancelEditCustomer = () => {
+        setEditingCustomerId(null);
+        // Очищаем данные формы
+        setFormData({
+            customer_name: '',
+            is_deleted: false,
+        });
+        setShowModal(false);
+    };
+
+    // Обновление заказчика
+    const updateCustomer = async () => {
+        try {
+            const response = await fetch(`http://localhost:8000/customers/update_by_id/${editingCustomerId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify(formData)
+            });
+            if (response.ok) {
+                console.log('Заказчик успешно обновлен');
+                cancelEditCustomer(); // Отменяем редактирование после успешного обновления
+                window.location.reload(); // Перезагружаем страницу после успешного обновления
+            } else {
+                console.error('Ошибка при обновлении заказчика:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Ошибка при выполнении запроса:', error);
+        }
     };
 
     // Обработчик для открытия модального окна
@@ -105,24 +150,28 @@ const Customer = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        try {
-            const response = await fetch('http://localhost:8000/customers/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`
-                },
-                body: JSON.stringify(formData)
-            });
-            if (response.ok) {
-                console.log('Заказчик успешно создан');
-                handleCloseModal(); // Закрываем модальное окно после успешного создания заказчика
-                window.location.reload(); // Перезагружаем страницу после успешного создания
-            } else {
-                console.error('Ошибка при создании заказчика:', response.statusText);
+        if (editingCustomerId) {
+            updateCustomer();
+        } else {
+            try {
+                const response = await fetch('http://localhost:8000/customers/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+                if (response.ok) {
+                    console.log('Заказчик успешно создан');
+                    handleCloseModal(); // Закрываем модальное окно после успешного создания
+                    window.location.reload(); // Перезагружаем страницу после успешного создания
+                } else {
+                    console.error('Ошибка при создании заказчика:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Ошибка при выполнении запроса:', error);
             }
-        } catch (error) {
-            console.error('Ошибка при выполнении запроса:', error);
         }
     };
 
@@ -154,7 +203,11 @@ const Customer = () => {
                             Удален ли:
                             <input type="checkbox" name="is_deleted" checked={formData.is_deleted} onChange={handleChange} />
                         </label>
-                        <button type="submit">Отправить</button>
+                        {editingCustomerId ? (
+                            <button onClick={updateCustomer}>Сохранить изменения</button>
+                        ) : (
+                            <button type="submit">Добавить заказчика</button>
+                        )}
                     </form>
                 </Modal>
             )}
@@ -173,12 +226,12 @@ const Customer = () => {
                             <FontAwesomeIcon
                                 className="icon"
                                 icon={faTrash}
-                                onClick={() => handleDeleteCustomer(customer.id)}
+                                onClick={() => handleDeleteCustomer(customer.customer_id)}
                             />
                             <FontAwesomeIcon
                                 className="icon"
                                 icon={faPenSquare}
-                                onClick={() => handleEditCustomer(customer.id)}
+                                onClick={() => handleEditCustomer(customer.customer_id)}
                             />
                         </td>
                     </tr>
