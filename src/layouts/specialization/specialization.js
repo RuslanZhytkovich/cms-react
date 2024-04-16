@@ -14,15 +14,14 @@ const Modal = ({ children, closeModal }) => {
 };
 
 const Specialization = () => {
-    const [customers, setCustomers] = useState([]);
+    const [specializations, setSpecializations] = useState([]);
     const [accessToken, setAccessToken] = useState('');
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
-        customer_name: '',
-        is_deleted: false,
+        specialization_name: '',
     });
-    const [editingCustomerId, setEditingCustomerId] = useState(null);
+    const [editingSpecializationId, setEditingSpecializationId] = useState(null);
 
     useEffect(() => {
         const fetchAccessToken = async () => {
@@ -44,16 +43,16 @@ const Specialization = () => {
     useEffect(() => {
         const fetchCustomers = async () => {
             try {
-                const response = await fetch('http://localhost:8000/customers/get_all', {
+                const response = await fetch('http://localhost:8000/specializations/get_all', {
                     headers: {
                         'Authorization': `Bearer ${accessToken}`
                     }
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setCustomers(data);
+                    setSpecializations(data);
                 } else {
-                    console.error('Ошибка при получении заказчиков:', response.statusText);
+                    console.error('Ошибка при получении специализаций:', response.statusText);
                 }
             } catch (error) {
                 console.error('Ошибка при выполнении запроса:', error);
@@ -67,23 +66,23 @@ const Specialization = () => {
         }
     }, [accessToken]);
 
-    // Обработчик для удаления заказчика
-    const handleDeleteCustomer = async (customerId) => {
+    // Обработчик для удаления специализации
+    const handleDeleteSpecialization = async (specializationId) => {
         try {
-            const customerToDelete = customers.find(c => c.customer_id === customerId);
-            const confirmDelete = window.confirm(`Вы точно хотите удалить заказчика с именем: ${customerToDelete.customer_name}`);
+            const specializationToDelete = specializations.find(c => c.specialization_id === specializationId);
+            const confirmDelete = window.confirm(`Вы точно хотите удалить специализацию с именем: ${specializationToDelete.specialization_name}`);
             if (confirmDelete) {
-                const response = await fetch(`http://localhost:8000/customers/soft_delete/${customerId}`, {
+                const response = await fetch(`http://localhost:8000/specializations/soft_delete/${specializationId}`, {
                     method: 'PATCH',
                     headers: {
                         'Authorization': `Bearer ${accessToken}`
                     }
                 });
                 if (response.ok) {
-                    console.log('Заказчик успешно удален');
-                    window.location.reload(); // Перезагружаем страницу после успешного удаления
+                    console.log('Специализация успешно удалена');
+                    setSpecializations(specializations.filter(specialization => specialization.specialization_id !== specializationId));
                 } else {
-                    console.error('Ошибка при удалении заказчика:', response.statusText);
+                    console.error('Ошибка при удалении специализации:', response.statusText);
                 }
             }
         } catch (error) {
@@ -91,32 +90,30 @@ const Specialization = () => {
         }
     };
 
-    // Обработчик для редактирования заказчика
-    const handleEditCustomer = (customerId) => {
-        setEditingCustomerId(customerId);
-        const customerToEdit = customers.find(customer => customer.customer_id === customerId);
+    // Обработчик для редактирования специализации
+    const handleEditSpecialization = (specializationId) => {
+        setEditingSpecializationId(specializationId);
+        const specializationToEdit = specializations.find(specialization => specialization.specialization_id === specializationId);
         setFormData({
-            customer_name: customerToEdit.customer_name,
-            is_deleted: customerToEdit.is_deleted,
+            specialization_name: specializationToEdit.specialization_name,
         });
         setShowModal(true);
     };
 
     // Обработчик для отмены редактирования
-    const cancelEditCustomer = () => {
-        setEditingCustomerId(null);
+    const cancelEditSpecialization = () => {
+        setEditingSpecializationId(null);
         // Очищаем данные формы
         setFormData({
-            customer_name: '',
-            is_deleted: false,
+            specialization_name: '',
         });
         setShowModal(false);
     };
 
-    // Обновление заказчика
-    const updateCustomer = async () => {
+    // Обновление специализации
+    const updateSpecialization = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/customers/update_by_id/${editingCustomerId}`, {
+            const response = await fetch(`http://localhost:8000/specializations/update_by_id/${editingSpecializationId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -125,11 +122,11 @@ const Specialization = () => {
                 body: JSON.stringify(formData)
             });
             if (response.ok) {
-                console.log('Заказчик успешно обновлен');
-                cancelEditCustomer(); // Отменяем редактирование после успешного обновления
-                window.location.reload(); // Перезагружаем страницу после успешного обновления
+                console.log('Специализация успешно обновлена');
+                cancelEditSpecialization(); // Отменяем редактирование после успешного обновления
+                window.location.reload(); // Перезагружаем страницу после успешного создания
             } else {
-                console.error('Ошибка при обновлении заказчика:', response.statusText);
+                console.error('Ошибка при обновлении специализации:', response.statusText);
             }
         } catch (error) {
             console.error('Ошибка при выполнении запроса:', error);
@@ -150,11 +147,11 @@ const Specialization = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (editingCustomerId) {
-            updateCustomer();
+        if (editingSpecializationId) {
+            updateSpecialization();
         } else {
             try {
-                const response = await fetch('http://localhost:8000/customers/create', {
+                const response = await fetch('http://localhost:8000/specializations/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -163,17 +160,18 @@ const Specialization = () => {
                     body: JSON.stringify(formData)
                 });
                 if (response.ok) {
-                    console.log('Заказчик успешно создан');
+                    console.log('Специализация успешно создан');
                     handleCloseModal(); // Закрываем модальное окно после успешного создания
                     window.location.reload(); // Перезагружаем страницу после успешного создания
                 } else {
-                    console.error('Ошибка при создании заказчика:', response.statusText);
+                    console.error('Ошибка при создании специализации:', response.statusText);
                 }
             } catch (error) {
                 console.error('Ошибка при выполнении запроса:', error);
             }
         }
     };
+
 
     // Обработчик изменения значений формы
     const handleChange = (event) => {
@@ -190,23 +188,19 @@ const Specialization = () => {
 
     return (
         <div>
-            <h2>Заказчики</h2>
-            <button onClick={handleOpenModal}>Добавить заказчика <FontAwesomeIcon icon={faPlus}/></button>
+            <h2>Специализации</h2>
+            <button onClick={handleOpenModal}>Добавить специализацию <FontAwesomeIcon icon={faPlus}/></button>
             {showModal && (
                 <Modal closeModal={handleCloseModal}>
                     <form onSubmit={handleSubmit}>
                         <label>
-                            Имя заказчика:
-                            <input type="text" name="customer_name" value={formData.customer_name} onChange={handleChange} />
+                            Специализация:
+                            <input type="text" name="specialization_name" value={formData.specialization_name} onChange={handleChange} />
                         </label>
-                        <label>
-                            Удален ли:
-                            <input type="checkbox" name="is_deleted" checked={formData.is_deleted} onChange={handleChange} />
-                        </label>
-                        {editingCustomerId ? (
-                            <button onClick={updateCustomer}>Сохранить изменения</button>
+                        {editingSpecializationId ? (
+                            <button type="button" onClick={updateSpecialization}>Сохранить изменения</button>
                         ) : (
-                            <button type="submit">Добавить заказчика</button>
+                            <button type="submit">Добавить специализацию</button>
                         )}
                     </form>
                 </Modal>
@@ -215,25 +209,25 @@ const Specialization = () => {
                 <thead>
                 <tr>
                     <th>Номер</th>
-                    <th>Имя заказчика</th>
+                    <th>Специализация</th>
                     <th>Действие</th>
                 </tr>
                 </thead>
                 <tbody>
-                {customers.map((customer, index) => (
+                {specializations.map((specialization, index) => (
                     <tr key={index}>
-                        <td>{customer.customer_id}</td>
-                        <td>{customer.customer_name}</td>
+                        <td>{specialization.specialization_id}</td>
+                        <td>{specialization.specialization_name}</td>
                         <td className="icon-container">
                             <FontAwesomeIcon
                                 className="icon"
                                 icon={faTrash}
-                                onClick={() => handleDeleteCustomer(customer.customer_id)}
+                                onClick={() => handleDeleteSpecialization(specialization.specialization_id)}
                             />
                             <FontAwesomeIcon
                                 className="icon"
                                 icon={faPenSquare}
-                                onClick={() => handleEditCustomer(customer.customer_id)}
+                                onClick={() => handleEditSpecialization(specialization.specialization_id)}
                             />
                         </td>
                     </tr>

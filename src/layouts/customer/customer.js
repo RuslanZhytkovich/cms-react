@@ -20,7 +20,6 @@ const Customer = () => {
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
         customer_name: '',
-        is_deleted: false,
     });
     const [editingCustomerId, setEditingCustomerId] = useState(null);
 
@@ -198,10 +197,6 @@ const Customer = () => {
                         <label>
                             Имя заказчика:
                             <input type="text" name="customer_name" value={formData.customer_name} onChange={handleChange} />
-                        </label>
-                        <label>
-                            Удален ли:
-                            <input type="checkbox" name="is_deleted" checked={formData.is_deleted} onChange={handleChange} />
                         </label>
                         {editingCustomerId ? (
                             <button onClick={updateCustomer}>Сохранить изменения</button>
