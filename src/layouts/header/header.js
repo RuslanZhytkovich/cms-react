@@ -16,8 +16,12 @@ const Header = () => {
                     <li><Link to="/home">Главная</Link></li>
                     <li><Link to="/projects">Проекты</Link></li>
                     <li><Link to="/customers">Заказчики</Link></li>
+                    <li><Link to="/specializations">Специализации</Link></li>
+                    <li><Link to="/users">Пользователи</Link></li>
                     <li><Link to="/account">Аккаунт</Link></li>
-                    <li><button onClick={logout}>Выйти</button></li>
+                    <li>
+                        <button onClick={logout}>Выйти</button>
+                    </li>
                 </ul>
             </nav>
         </header>

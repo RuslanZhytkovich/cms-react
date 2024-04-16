@@ -13,7 +13,7 @@ const Modal = ({ children, closeModal }) => {
     );
 };
 
-const Customer = () => {
+const Specialization = () => {
     const [customers, setCustomers] = useState([]);
     const [accessToken, setAccessToken] = useState('');
     const [loading, setLoading] = useState(true);
@@ -244,4 +244,4 @@ const Customer = () => {
     );
 };
 
-export default Customer;
+export default Specialization;

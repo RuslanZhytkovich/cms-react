@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faPenSquare, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faPenSquare, faPlus } from '@fortawesome/free-solid-svg-icons'; // Иконки удаления, редактирования и добавления
 
 const Modal = ({ children, closeModal }) => {
     return (
@@ -23,9 +23,12 @@ const Project = () => {
         start_date: '',
         end_date: '',
         customer_id: '',
+        customer_name: '', // Включаем поле для имени заказчика
         is_deleted: false,
     });
     const [editingProjectId, setEditingProjectId] = useState(null);
+    const [customerNames, setCustomerNames] = useState({});
+    const [customers, setCustomers] = useState([]);
 
     useEffect(() => {
         const fetchAccessToken = async () => {
@@ -70,18 +73,74 @@ const Project = () => {
         }
     }, [accessToken]);
 
-    // Обработчик для удаления проекта
+    useEffect(() => {
+        const fetchCustomerNames = async () => {
+            const names = {};
+            for (const project of projects) {
+                const customerName = await fetchCustomerNameById(project.customer_id);
+                names[project.project_id] = customerName;
+            }
+            setCustomerNames(names);
+        };
+
+        fetchCustomerNames();
+    }, [projects]);
+
+    useEffect(() => {
+        const fetchCustomers = async () => {
+            try {
+                const response = await fetch('http://localhost:8000/customers/get_all', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setCustomers(data);
+                } else {
+                    console.error('Ошибка при получении списка заказчиков:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Ошибка при выполнении запроса:', error);
+            }
+        };
+
+        if (accessToken) {
+            fetchCustomers();
+        }
+    }, [accessToken]);
+
+    const fetchCustomerNameById = async (customerId) => {
+        try {
+            const response = await fetch(`http://localhost:8000/customers/get_by_id/${customerId}`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                return data.customer_name;
+            } else {
+                console.error('Ошибка при получении имени заказчика:', response.statusText);
+                return null;
+            }
+        } catch (error) {
+            console.error('Ошибка при выполнении запроса:', error);
+            return null;
+        }
+    };
+
     const handleDeleteProject = async (projectId) => {
         try {
-            const response = await fetch(`http://localhost:8000/projects/delete/${projectId}`, {
-                method: 'DELETE',
+            const response = await fetch(`http://localhost:8000/projects/soft_delete/${projectId}`, {
+                method: 'PATCH',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 }
             });
             if (response.ok) {
                 console.log('Проект успешно удален');
-                window.location.reload(); // Перезагружаем страницу после успешного удаления
+                window.location.reload();
             } else {
                 console.error('Ошибка при удалении проекта:', response.statusText);
             }
@@ -90,54 +149,73 @@ const Project = () => {
         }
     };
 
-    // Обработчик для редактирования проекта
-    const handleEditProject = (projectId) => {
+    const handleEditProject = async (projectId) => {
         setEditingProjectId(projectId);
-        const projectToEdit = projects.find(project => project.id === projectId);
-        setFormData({
-            project_name: projectToEdit.project_name,
-            start_date: projectToEdit.start_date,
-            end_date: projectToEdit.end_date,
-            customer_id: projectToEdit.customer_id,
-            is_deleted: projectToEdit.is_deleted,
-        });
-        setShowModal(true);
+        const projectToEdit = projects.find(project => project.project_id === projectId);
+        if (projectToEdit) {
+            const customerName = await fetchCustomerNameById(projectToEdit.customer_id);
+            setFormData({
+                project_name: projectToEdit.project_name,
+                start_date: projectToEdit.start_date,
+                end_date: projectToEdit.end_date,
+                customer_id: projectToEdit.customer_id,
+                customer_name: customerName, // Устанавливаем имя заказчика в форму
+                is_deleted: projectToEdit.is_deleted,
+            });
+            setShowModal(true);
+        } else {
+            console.error(`Проект с идентификатором ${projectId} не найден.`);
+        }
     };
 
-    // Обработчик для открытия модального окна
+    const cancelEditProject = () => {
+        setEditingProjectId(null);
+        setFormData({
+            project_name: '',
+            start_date: '',
+            end_date: '',
+            customer_id: '',
+            customer_name: '', // Очищаем имя заказчика
+            is_deleted: false,
+        });
+        setShowModal(false);
+    };
+
+    const updateProject = async () => {
+        try {
+            const response = await fetch(`http://localhost:8000/projects/update_by_id/${editingProjectId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify(formData)
+            });
+            if (response.ok) {
+                console.log('Проект успешно обновлен');
+                cancelEditProject();
+                window.location.reload();
+            } else {
+                console.error('Ошибка при обновлении проекта:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Ошибка при выполнении запроса:', error);
+        }
+    };
+
     const handleOpenModal = () => {
         setShowModal(true);
     };
 
-    // Обработчик для закрытия модального окна
     const handleCloseModal = () => {
         setShowModal(false);
     };
 
-    // Обработчик для отправки формы
     const handleSubmit = async (event) => {
         event.preventDefault();
 
         if (editingProjectId) {
-            try {
-                const response = await fetch(`http://localhost:8000/projects/update/${editingProjectId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`
-                    },
-                    body: JSON.stringify(formData)
-                });
-                if (response.ok) {
-                    console.log('Проект успешно обновлен');
-                    handleCloseModal(); // Закрываем модальное окно после успешного обновления
-                    window.location.reload(); // Перезагружаем страницу после успешного обновления
-                } else {
-                    console.error('Ошибка при обновлении проекта:', response.statusText);
-                }
-            } catch (error) {
-                console.error('Ошибка при выполнении запроса:', error);
-            }
+            updateProject();
         } else {
             try {
                 const response = await fetch('http://localhost:8000/projects/create', {
@@ -150,10 +228,10 @@ const Project = () => {
                 });
                 if (response.ok) {
                     console.log('Проект успешно создан');
-                    handleCloseModal(); // Закрываем модальное окно после успешного создания
-                    window.location.reload(); // Перезагружаем страницу после успешного создания
+                    handleCloseModal();
+                    window.location.reload();
                 } else {
-                    console.error('Ошибка при создании проекта:', response.statusText);
+                    console.error('Ошибка при создании преокта:', response.statusText);
                 }
             } catch (error) {
                 console.error('Ошибка при выполнении запроса:', error);
@@ -161,7 +239,6 @@ const Project = () => {
         }
     };
 
-    // Обработчик изменения значений формы
     const handleChange = (event) => {
         const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
         setFormData({
@@ -194,8 +271,15 @@ const Project = () => {
                             <input type="date" name="end_date" value={formData.end_date} onChange={handleChange} />
                         </label>
                         <label>
-                            ID заказчика:
-                            <input type="text" name="customer_id" value={formData.customer_id} onChange={handleChange} />
+                            Заказчик:
+                            <select name="customer_id" value={formData.customer_id} onChange={handleChange}>
+                                <option value="">Выберите заказчика</option>
+                                {customers.map(customer => (
+                                    <option key={customer.customer_id} value={customer.customer_id}>
+                                        {customer.customer_name}
+                                    </option>
+                                ))}
+                            </select>
                         </label>
                         <label>
                             Удален ли:
@@ -212,30 +296,32 @@ const Project = () => {
             <table className="table">
                 <thead>
                 <tr>
+                    <th>Номер</th>
                     <th>Название проекта</th>
                     <th>Начало проекта</th>
                     <th>Конец проекта</th>
-                    <th>ID заказчика</th>
+                    <th>Имя заказчика</th>
                     <th>Действие</th>
                 </tr>
                 </thead>
                 <tbody>
                 {projects.map((project, index) => (
                     <tr key={index}>
+                        <td>{project.project_id}</td>
                         <td>{project.project_name}</td>
                         <td>{project.start_date}</td>
                         <td>{project.end_date}</td>
-                        <td>{project.customer_id}</td>
+                        <td>{customerNames[project.project_id]}</td>
                         <td className="icon-container">
                             <FontAwesomeIcon
                                 className="icon"
                                 icon={faTrash}
-                                onClick={() => handleDeleteProject(project.id)}
+                                onClick={() => handleDeleteProject(project.project_id)}
                             />
                             <FontAwesomeIcon
                                 className="icon"
                                 icon={faPenSquare}
-                                onClick={() => handleEditProject(project.id)}
+                                onClick={() => handleEditProject(project.project_id)}
                             />
                         </td>
                     </tr>
