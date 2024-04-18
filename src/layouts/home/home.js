@@ -131,6 +131,8 @@ const Home = () => {
 
     const handleDeleteReport = async (reportId) => {
         try {
+            const confirmDelete = window.confirm(`Вы точно хотите удалить отчет с номером: ${reportId}`);
+            if(confirmDelete) {
             const response = await fetch(`http://localhost:8000/reports/soft_delete/${reportId}`, {
                 method: 'PATCH',
                 headers: {
@@ -144,7 +146,9 @@ const Home = () => {
             } else {
                 console.error('Error deleting report:', response.statusText);
             }
-        } catch (error) {
+            }
+        }
+        catch (error) {
             console.error('Error executing request:', error);
         }
     };
