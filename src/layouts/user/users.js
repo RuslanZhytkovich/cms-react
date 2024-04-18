@@ -19,7 +19,14 @@ const Users = () => {
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
         email: '',
+        name: '',
+        last_name: '',
+        telegram: '',
+        phone_number: '',
+        specialization_id: '',
         role: '',
+        time_created: '',
+        on_bench: false,
         is_deleted: false,
     });
     const [editingUserId, setEditingUserId] = useState(null);
@@ -176,8 +183,15 @@ const Users = () => {
                 <thead>
                 <tr>
                     <th>Идентификатор</th>
+                    <th>Имя</th>
+                    <th>Фамилия</th>
                     <th>Email</th>
                     <th>Роль</th>
+                    <th>Телеграм</th>
+                    <th>Номер телефона</th>
+                    <th>На бенче</th>
+                    <th>Дата регистрации</th>
+                    <th>ID специализации</th>
                     <th>Действие</th>
                 </tr>
                 </thead>
@@ -185,8 +199,15 @@ const Users = () => {
                 {users.map((user, index) => (
                     <tr key={index}>
                         <td>{user.user_id}</td>
+                        <td>{user.name}</td>
+                        <td>{user.last_name}</td>
                         <td>{user.email}</td>
                         <td>{user.role}</td>
+                        <td>{user.telegram}</td>
+                        <td>{user.phone_number}</td>
+                        <td>{user.on_bench}</td>
+                        <td>{user.time_created}</td>
+                        <td>{user.specialization_id}</td>
                         <td className="icon-container">
                             <FontAwesomeIcon
                                 className="icon"

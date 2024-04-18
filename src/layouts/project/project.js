@@ -132,22 +132,27 @@ const Project = () => {
 
     const handleDeleteProject = async (projectId) => {
         try {
-            const response = await fetch(`http://localhost:8000/projects/soft_delete/${projectId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
+            const projectToDelete = projects.find(c => c.project_id === projectId);
+            const confirmDelete = window.confirm(`Вы точно хотите проект: ${projectToDelete.project_name}`);
+            if (confirmDelete) {
+                const response = await fetch(`http://localhost:8000/projects/soft_delete/${projectId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                if (response.ok) {
+                    console.log('Проект успешно удален');
+                    window.location.reload();
+                } else {
+                    console.error('Ошибка при удалении проекта:', response.statusText);
                 }
-            });
-            if (response.ok) {
-                console.log('Проект успешно удален');
-                window.location.reload();
-            } else {
-                console.error('Ошибка при удалении проекта:', response.statusText);
             }
         } catch (error) {
             console.error('Ошибка при выполнении запроса:', error);
         }
     };
+
 
     const handleEditProject = async (projectId) => {
         setEditingProjectId(projectId);
@@ -280,10 +285,6 @@ const Project = () => {
                                     </option>
                                 ))}
                             </select>
-                        </label>
-                        <label>
-                            Удален ли:
-                            <input type="checkbox" name="is_deleted" checked={formData.is_deleted} onChange={handleChange} />
                         </label>
                         {editingProjectId ? (
                             <button onClick={handleSubmit}>Сохранить изменения</button>

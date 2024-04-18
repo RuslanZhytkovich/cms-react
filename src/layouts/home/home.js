@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Home.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faPenSquare, faPlus } from '@fortawesome/free-solid-svg-icons'; // Иконки удаления, редактирования и добавления
+import { faTrash, faPenSquare, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 const Modal = ({ children, closeModal }) => {
     return (
@@ -18,51 +18,16 @@ const Home = () => {
     const [reports, setReports] = useState([]);
     const [accessToken, setAccessToken] = useState('');
     const [loading, setLoading] = useState(true);
-    const [projectNames, setProjectNames] = useState({});
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
         date: '',
         hours: '',
         comment: '',
-        project_id: ''
+        project_id: '',
     });
-    const [allProjects, setAllProjects] = useState([]);
-
-    const getProjectName = async (projectId) => {
-        try {
-            const response = await fetch(`http://localhost:8000/projects/get_by_id/${projectId}`, {
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                return data.project_name;
-            } else {
-                console.error('Ошибка при получении имени проекта:', response.statusText);
-            }
-        } catch (error) {
-            console.error('Ошибка при выполнении запроса:', error);
-        }
-    };
-
-    const getAllProjects = async () => {
-        try {
-            const response = await fetch('http://localhost:8000/projects/get_all', {
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setAllProjects(data);
-            } else {
-                console.error('Ошибка при получении списка проектов:', response.statusText);
-            }
-        } catch (error) {
-            console.error('Ошибка при выполнении запроса:', error);
-        }
-    };
+    const [editingReportId, setEditingReportId] = useState(null);
+    const [projectNames, setProjectNames] = useState({});
+    const [projects, setProjects] = useState([]);
 
     useEffect(() => {
         const fetchAccessToken = async () => {
@@ -93,10 +58,10 @@ const Home = () => {
                     const data = await response.json();
                     setReports(data);
                 } else {
-                    console.error('Ошибка при получении отчетов:', response.statusText);
+                    console.error('Error fetching reports:', response.statusText);
                 }
             } catch (error) {
-                console.error('Ошибка при выполнении запроса:', error);
+                console.error('Error executing request:', error);
             } finally {
                 setLoading(false);
             }
@@ -111,58 +76,113 @@ const Home = () => {
         const fetchProjectNames = async () => {
             const names = {};
             for (const report of reports) {
-                if (!projectNames[report.project_id]) {
-                    const projectName = await getProjectName(report.project_id);
-                    names[report.project_id] = projectName;
-                }
+                const projectName = await fetchProjectNameById(report.project_id);
+                names[report.report_id] = projectName;
             }
             setProjectNames(names);
         };
 
-        if (reports.length > 0) {
-            fetchProjectNames();
-        }
+        fetchProjectNames();
     }, [reports]);
 
     useEffect(() => {
-        if (showModal) {
-            getAllProjects();
+        const fetchProjects = async () => {
+            try {
+                const response = await fetch('http://localhost:8000/projects/get_all', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setProjects(data);
+                } else {
+                    console.error('Error fetching project list:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error executing request:', error);
+            }
+        };
+
+        if (accessToken) {
+            fetchProjects();
         }
-    }, [showModal]);
+    }, [accessToken]);
 
-    // Обработчик для удаления отчета
-    const handleDeleteReport = (index) => {
-        // Реализуйте логику удаления отчета по индексу
+    const fetchProjectNameById = async (projectId) => {
+        try {
+            const response = await fetch(`http://localhost:8000/projects/get_by_id/${projectId}`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                return data.customer_name;
+            } else {
+                console.error('Error fetching project name:', response.statusText);
+                return null;
+            }
+        } catch (error) {
+            console.error('Error executing request:', error);
+            return null;
+        }
     };
 
-    // Обработчик для редактирования отчета
-    const handleEditReport = (index) => {
-        // Реализуйте логику редактирования отчета по индексу
+    const handleDeleteReport = async (reportId) => {
+        try {
+            const response = await fetch(`http://localhost:8000/reports/soft_delete/${reportId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            if (response.ok) {
+                console.log('Report successfully deleted');
+                const updatedReports = reports.filter(report => report.report_id !== reportId);
+                setReports(updatedReports);
+            } else {
+                console.error('Error deleting report:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error executing request:', error);
+        }
     };
 
-    // Обработчик для открытия модального окна
-    const handleOpenModal = () => {
-        setShowModal(true);
+    const handleEditReport = async (reportId) => {
+        setEditingReportId(reportId);
+        const reportToEdit = reports.find(report => report.report_id === reportId);
+        if (reportToEdit) {
+            const projectName = await fetchProjectNameById(reportToEdit.project_id);
+            setFormData({
+                date: reportToEdit.date,
+                hours: reportToEdit.hours,
+                comment: reportToEdit.comment,
+                project_id: reportToEdit.project_id,
+                is_deleted: reportToEdit.is_deleted,
+            });
+            setShowModal(true);
+        } else {
+            console.error(`Report with id ${reportId} not found.`);
+        }
     };
 
-    // Обработчик для закрытия модального окна
-    const handleCloseModal = () => {
+    const cancelEditReport = () => {
+        setEditingReportId(null);
+        setFormData({
+            date: '',
+            hours: '',
+            comment: '',
+            project_id: '',
+            is_deleted: false,
+        });
         setShowModal(false);
     };
 
-    // Обработчик для отправки формы
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-
-        const hours = parseInt(formData.hours);
-        if (hours < 0 || hours > 24) {
-            alert('Пожалуйста, введите количество часов от 0 до 24.');
-            return;
-        }
-
+    const updateReport = async () => {
         try {
-            const response = await fetch('http://localhost:8000/reports/create', {
-                method: 'POST',
+            const response = await fetch(`http://localhost:8000/reports/update_by_id/${editingReportId}`, {
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${accessToken}`
@@ -170,107 +190,127 @@ const Home = () => {
                 body: JSON.stringify(formData)
             });
             if (response.ok) {
-                // Успешно создан отчет
-                // После успешного создания отчета можно сбросить форму или выполнить другие действия
-                console.log('Отчет успешно создан');
-                handleCloseModal(); // Закрываем модальное окно после успешного создания отчета
-                window.location.reload(); // Обновляем страницу
+                console.log('Report successfully updated');
+                cancelEditReport();
+                window.location.reload();
             } else {
-                console.error('Ошибка при создании отчета:', response.statusText);
+                console.error('Error updating report:', response.statusText);
             }
         } catch (error) {
-            console.error('Ошибка при выполнении запроса:', error);
+            console.error('Error executing request:', error);
         }
     };
 
-    // Обработчик изменения значений формы
+    const handleOpenModal = () => {
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        if (editingReportId) {
+            updateReport();
+        } else {
+            try {
+                const response = await fetch('http://localhost:8000/reports/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+                if (response.ok) {
+                    console.log('Report successfully created');
+                    handleCloseModal();
+                    window.location.reload();
+                } else {
+                    console.error('Error creating report:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error executing request:', error);
+            }
+        }
+    };
+
     const handleChange = (event) => {
-        const { name, value } = event.target;
+        const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
         setFormData({
             ...formData,
-            [name]: value
+            [event.target.name]: value
         });
     };
 
-
     if (loading) {
-        return <p>Загрузка...</p>;
-    }
-
-    if (reports.length === 0) {
-        return (
-            <div>
-                <h2>Главная!</h2>
-                <p>Отчетов нету</p>
-                <button onClick={handleOpenModal}>Сделать отчет <FontAwesomeIcon icon={faPlus}/></button>
-            </div>
-        );
+        return <p>Loading...</p>;
     }
 
     return (
         <div>
-            <h2>Главная!</h2>
-            <p>Мои отчеты!</p>
-            <button onClick={handleOpenModal}>Сделать отчет <FontAwesomeIcon icon={faPlus}/></button>
+            <h2>Home!</h2>
+            <p>My reports!</p>
+            <button onClick={handleOpenModal}>Create Report <FontAwesomeIcon icon={faPlus}/></button>
             {showModal && (
                 <Modal closeModal={handleCloseModal}>
                     <form onSubmit={handleSubmit}>
                         <label>
-                            Дата:
-                            <input type="text" name="date" value={formData.date} onChange={handleChange} />
+                            Date:
+                            <input type="date" name="date" value={formData.date} onChange={handleChange} />
                         </label>
                         <label>
-                            Часы:
+                            Hours:
                             <input type="number" name="hours" value={formData.hours} onChange={handleChange} min="0" max="24" />
                         </label>
                         <label>
-                            Комментарий:
+                            Comment:
                             <input type="text" name="comment" value={formData.comment} onChange={handleChange} />
                         </label>
                         <label>
-                            Проект:
+                            Project:
                             <select name="project_id" value={formData.project_id} onChange={handleChange}>
-                                <option value="">Выберите проект</option>
-                                {allProjects.map((project) => (
-                                    <option key={project.id} value={project.id}>{project.project_name}</option>
+                                <option value="">Select project</option>
+                                {projects.map((project) => (
+                                    <option key={project.project_id} value={project.project_id}>{project.project_name}</option>
                                 ))}
                             </select>
                         </label>
-                        <label>
-                            ID проекта:
-                            <input type="text" name="project_id" value={formData.project_id} onChange={handleChange} />
-                        </label>
-                        <button type="submit">Отправить</button>
+                        <button type="submit">Submit</button>
                     </form>
                 </Modal>
             )}
             <table className="table">
                 <thead>
                 <tr>
-                    <th>Дата</th>
-                    <th>Часы</th>
-                    <th>Комментарий</th>
-                    <th>Проект</th>
-                    <th>Действие</th>
+                    <th>Id</th>
+                    <th>Date</th>
+                    <th>Hours</th>
+                    <th>Comment</th>
+                    <th>Project</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
                 {reports.map((report, index) => (
                     <tr key={index}>
+                        <td>{report.report_id}</td>
                         <td>{report.date}</td>
                         <td>{report.hours}</td>
                         <td>{report.comment}</td>
-                        <td>{projectNames[report.project_id]}</td>
+                        <td>{projectNames[report.project_id]}</td> {/* Display project name */}
                         <td className="icon-container">
                             <FontAwesomeIcon
                                 className="icon"
                                 icon={faTrash}
-                                onClick={() => handleDeleteReport(index)}
+                                onClick={() => handleDeleteReport(report.report_id)}
                             />
                             <FontAwesomeIcon
                                 className="icon"
                                 icon={faPenSquare}
-                                onClick={() => handleEditReport(index)}
+                                onClick={() => handleEditReport(report.report_id)}
                             />
                         </td>
                     </tr>
