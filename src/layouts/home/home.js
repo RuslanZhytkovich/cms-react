@@ -97,7 +97,7 @@ const Home = () => {
                     const data = await response.json();
                     setProjects(data);
                 } else {
-                    console.error('Error fetching project list:', response.statusText);
+                    console.error('Error fetching projects:', response.statusText);
                 }
             } catch (error) {
                 console.error('Error executing request:', error);
@@ -118,7 +118,7 @@ const Home = () => {
             });
             if (response.ok) {
                 const data = await response.json();
-                return data.customer_name;
+                return data.project_name;
             } else {
                 console.error('Error fetching project name:', response.statusText);
                 return null;
@@ -131,24 +131,23 @@ const Home = () => {
 
     const handleDeleteReport = async (reportId) => {
         try {
-            const confirmDelete = window.confirm(`Вы точно хотите удалить отчет с номером: ${reportId}`);
-            if(confirmDelete) {
-            const response = await fetch(`http://localhost:8000/reports/soft_delete/${reportId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
+            const confirmDelete = window.confirm(`Are you sure you want to delete report with ID: ${reportId}`);
+            if (confirmDelete) {
+                const response = await fetch(`http://localhost:8000/reports/soft_delete/${reportId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                if (response.ok) {
+                    alert('Отчет успешно удален');
+                    const updatedReports = reports.filter(report => report.report_id !== reportId);
+                    setReports(updatedReports);
+                } else {
+                    console.error('Error deleting report:', response.statusText);
                 }
-            });
-            if (response.ok) {
-                console.log('Report successfully deleted');
-                const updatedReports = reports.filter(report => report.report_id !== reportId);
-                setReports(updatedReports);
-            } else {
-                console.error('Error deleting report:', response.statusText);
             }
-            }
-        }
-        catch (error) {
+        } catch (error) {
             console.error('Error executing request:', error);
         }
     };
@@ -157,13 +156,12 @@ const Home = () => {
         setEditingReportId(reportId);
         const reportToEdit = reports.find(report => report.report_id === reportId);
         if (reportToEdit) {
-            const projectName = await fetchProjectNameById(reportToEdit.project_id);
             setFormData({
                 date: reportToEdit.date,
                 hours: reportToEdit.hours,
                 comment: reportToEdit.comment,
                 project_id: reportToEdit.project_id,
-                is_deleted: reportToEdit.is_deleted,
+                user_id: reportToEdit.user_id,
             });
             setShowModal(true);
         } else {
@@ -178,7 +176,6 @@ const Home = () => {
             hours: '',
             comment: '',
             project_id: '',
-            is_deleted: false,
         });
         setShowModal(false);
     };
@@ -255,9 +252,8 @@ const Home = () => {
 
     return (
         <div>
-            <h2>Home!</h2>
-            <p>My reports!</p>
-            <button onClick={handleOpenModal}>Create Report <FontAwesomeIcon icon={faPlus}/></button>
+            <h2>Отчеты</h2>
+            <button onClick={handleOpenModal}>Создать отчет <FontAwesomeIcon icon={faPlus}/></button>
             {showModal && (
                 <Modal closeModal={handleCloseModal}>
                     <form onSubmit={handleSubmit}>
@@ -304,7 +300,7 @@ const Home = () => {
                         <td>{report.date}</td>
                         <td>{report.hours}</td>
                         <td>{report.comment}</td>
-                        <td>{projectNames[report.project_id]}</td> {/* Display project name */}
+                        <td>{projectNames[report.report_id]}</td>
                         <td className="icon-container">
                             <FontAwesomeIcon
                                 className="icon"
