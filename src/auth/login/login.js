@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import './login.css';
-import {setAccessTokenToLocalStorage, setRefreshTokenToCookie} from "../Auth";
-import {useNavigate} from "react-router-dom";
-
+import { setAccessTokenToLocalStorage, setRefreshTokenToCookie } from "../Auth";
+import { useNavigate } from "react-router-dom";
+import email_icon from "./assets/email.png";
+import password_icon from "./assets/password.png";
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -20,7 +21,10 @@ const Login = () => {
         });
 
         setErrors({});
+    };
 
+    const handleRegisterClick = () => {
+        navigate('/register');
     };
 
     const handleSubmit = async (e) => {
@@ -74,35 +78,40 @@ const Login = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <h1>Вход в систему</h1>
-                <label>Email:</label>
-                <input
-                    name="email"
-                    placeholder='example@gmail.com'
-                    autoComplete='off'
-                    onChange={handleChange}
-                    title="Введите корректный email адрес (например, example@gmail.com)"
-                />
-                {errors.email && <span>{errors.email}</span>}
+        <div className="container">
+            <div className="header">
+                <div className="text">Вход в систему</div>
+                <div className="underline"></div>
             </div>
-            <div>
-                <label>Пароль:</label>
-                <input
-                    type="password"
-                    name="password"
-                    placeholder='******'
-                    onChange={handleChange}
-                />
-                {errors.password && <span>{errors.password}</span>}
+            <div className="inputs">
+                <div className="input">
+                    <img src={email_icon} alt=""/>
+                    <input
+                        name="email"
+                        placeholder='Email'
+                        autoComplete='off'
+                        onChange={handleChange}
+                        title="Введите корректный email адрес (например, example@gmail.com)"
+                    />
+                    {errors.email && <span>{errors.email}</span>}
+                </div>
+                <div className="input">
+                    <img src={password_icon} alt=""/>
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder='Пароль'
+                        onChange={handleChange}
+                    />
+                    {errors.password && <span>{errors.password}</span>}
+                </div>
             </div>
-
-            <button type="submit">Подтвердить</button>
-        </form>
+            <div className="forgot-password">Еще не зарегестрированы? <span onClick={handleRegisterClick}> Зарегестрироваться!</span></div>
+            <div className="submit-container">
+                <button type="button" className="submit" onClick={handleSubmit}>Подтвердить</button>
+            </div>
+        </div>
     );
 };
 
 export default Login;
-
-

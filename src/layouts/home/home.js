@@ -4,8 +4,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPenSquare, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 const Modal = ({ children, closeModal }) => {
+    const handleModalClick = (e) => {
+        if (e.target === e.currentTarget) {
+            closeModal();
+        }
+    };
+
     return (
-        <div className="modal">
+        <div className="modal" onClick={handleModalClick}>
             <div className="modal-content">
                 <span className="close" onClick={closeModal}>&times;</span>
                 {children}
@@ -13,6 +19,7 @@ const Modal = ({ children, closeModal }) => {
         </div>
     );
 };
+
 
 const Home = () => {
     const [reports, setReports] = useState([]);
@@ -258,39 +265,39 @@ const Home = () => {
                 <Modal closeModal={handleCloseModal}>
                     <form onSubmit={handleSubmit}>
                         <label>
-                            Date:
+                            Дата:
                             <input type="date" name="date" value={formData.date} onChange={handleChange} />
                         </label>
                         <label>
-                            Hours:
+                            Часы:
                             <input type="number" name="hours" value={formData.hours} onChange={handleChange} min="0" max="24" />
                         </label>
                         <label>
-                            Comment:
+                            Описание:
                             <input type="text" name="comment" value={formData.comment} onChange={handleChange} />
                         </label>
                         <label>
-                            Project:
+                            Проект:
                             <select name="project_id" value={formData.project_id} onChange={handleChange}>
-                                <option value="">Select project</option>
+                                <option value="">Выберите проект</option>
                                 {projects.map((project) => (
                                     <option key={project.project_id} value={project.project_id}>{project.project_name}</option>
                                 ))}
                             </select>
                         </label>
-                        <button type="submit">Submit</button>
+                        <button type="submit">Создать</button>
                     </form>
                 </Modal>
             )}
             <table className="table">
                 <thead>
                 <tr>
-                    <th>Id</th>
-                    <th>Date</th>
-                    <th>Hours</th>
-                    <th>Comment</th>
-                    <th>Project</th>
-                    <th>Action</th>
+                    <th>Номер</th>
+                    <th>Дата</th>
+                    <th>Часы</th>
+                    <th>Описание</th>
+                    <th>Проект</th>
+                    <th>Действие</th>
                 </tr>
                 </thead>
                 <tbody>

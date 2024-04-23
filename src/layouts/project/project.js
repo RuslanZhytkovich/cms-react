@@ -3,8 +3,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPenSquare, faPlus } from '@fortawesome/free-solid-svg-icons'; // Иконки удаления, редактирования и добавления
 
 const Modal = ({ children, closeModal }) => {
+    const handleModalClick = (e) => {
+        if (e.target === e.currentTarget) {
+            closeModal();
+        }
+    };
+
     return (
-        <div className="modal">
+        <div className="modal" onClick={handleModalClick}>
             <div className="modal-content">
                 <span className="close" onClick={closeModal}>&times;</span>
                 {children}
@@ -12,7 +18,6 @@ const Modal = ({ children, closeModal }) => {
         </div>
     );
 };
-
 const Project = () => {
     const [projects, setProjects] = useState([]);
     const [accessToken, setAccessToken] = useState('');

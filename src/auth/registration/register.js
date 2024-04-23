@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './register-styles.css';
 import { useNavigate } from "react-router-dom";
+import password_icon from "./assets/password.png";
+import email_icon from "./assets/email.png";
 
 const Registration = () => {
     const [formData, setFormData] = useState({
@@ -80,42 +82,51 @@ const Registration = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <label>Email:</label>
-                <input
-                    name="email"
-                    placeholder='example@gmail.com'
-                    autoComplete='off'
-                    onChange={handleChange}
-                    title="Введите корректный email адрес (например, example@gmail.com)"
-                />
-                {errors.email && <span>{errors.email}</span>}
+        <div className="container">
+            <div className="header">
+                <div className="text">Регистрация</div>
+                <div className="underline"></div>
             </div>
-            <div>
-                <label>Пароль:</label>
-                <input
-                    type="password"
-                    name="password"
-                    placeholder='******'
-                    onChange={handleChange}
-                />
-                {errors.password && <span>{errors.password}</span>}
-            </div>
-            <div>
-                <label>Повтор пароля:</label>
-                <input
-                    type="password"
-                    name="confirmPassword"
-                    placeholder='******'
-                    onChange={handleChange}
-                />
-                {errors.confirmPassword && <span>{errors.confirmPassword}</span>}
+            <div className="inputs">
+                <div className="input">
+                    <img src={email_icon} alt=""/>
+                    <input
+                        name="email"
+                        placeholder='Email'
+                        autoComplete='off'
+                        onChange={handleChange}
+                        title="Введите корректный email адрес (например, example@gmail.com)"
+                    />
+                    {errors.email && <span>{errors.email}</span>}
+                </div>
+                <div className="input">
+                    <img src={password_icon} alt=""/>
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder='Пароль'
+                        onChange={handleChange}
+                    />
+                    {errors.password && <span>{errors.password}</span>}
+                </div>
+                <div className="input">
+                    <img src={password_icon} alt=""/>
+                    <input
+                        type="password"
+                        name="confirmPassword"
+                        placeholder='Повтор пароля'
+                        onChange={handleChange}
+                    />
+                    {errors.confirmPassword && <span>{errors.confirmPassword}</span>}
+                </div>
             </div>
             {errorMessage && <div className="error-message">{errorMessage}</div>}
-            <button type="submit">Подтвердить</button>
-        </form>
+            <div className="submit-container">
+                <button type="button" className="submit" onClick={handleSubmit}>Подтвердить</button>
+            </div>
+        </div>
     );
+
 };
 
 export default Registration;
