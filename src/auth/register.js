@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './register-styles.css';
+import  "./auth.css";
 import { useNavigate } from "react-router-dom";
 import password_icon from "./assets/password.png";
 import email_icon from "./assets/email.png";
@@ -13,8 +13,12 @@ const Registration = () => {
 
     const [errors, setErrors] = useState({});
     const [errorMessage, setErrorMessage] = useState('');
-
     const navigate = useNavigate(); // Перемещаем хук за пределы компонента
+
+
+    const handleLoginClick = () => {
+        navigate('/');
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -121,6 +125,7 @@ const Registration = () => {
                 </div>
             </div>
             {errorMessage && <div className="error-message">{errorMessage}</div>}
+            <div className="forgot-password">Уже есть аккаунт? <span onClick={handleLoginClick}> Войти!</span></div>
             <div className="submit-container">
                 <button type="button" className="submit" onClick={handleSubmit}>Подтвердить</button>
             </div>

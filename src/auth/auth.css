@@ -1,3 +1,5 @@
+
+
 body{
     background: linear-gradient(#2A00B7, #42006C);
     height: 100vh;
@@ -65,7 +67,7 @@ span {
 }
 
 .input img{
- margin: 0px 30px;
+    margin: 0px 30px;
 }
 
 .input input{
@@ -86,7 +88,7 @@ span {
 
 .forgot-password{
     display: flex;
-    padding-left: 62px;
+    padding-left: 100px;
     margin-top: 27px;
     color: #797979;
     font-size: 18px;

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import './login.css';
-import { setAccessTokenToLocalStorage, setRefreshTokenToCookie } from "../Auth";
+import { setAccessTokenToLocalStorage, setRefreshTokenToCookie } from "./Auth";
 import { useNavigate } from "react-router-dom";
-import email_icon from "./assets/email.png";
 import password_icon from "./assets/password.png";
+import email_icon from "./assets/email.png";
+import  "./auth.css";
 
 const Login = () => {
     const [formData, setFormData] = useState({

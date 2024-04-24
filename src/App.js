@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Login from "./auth/login/login";
-import Registration from "./auth/registration/register";
+import Login from "./auth/login";
+import Registration from "./auth/register";
 import NotFound from "./layouts/errors/NotFound";
 import {RequireToken} from "./auth/Auth";
 import Header from "./layouts/header/header";
