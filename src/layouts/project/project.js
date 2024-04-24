@@ -5,6 +5,7 @@ import Modal from "../../components/modal";
 
 const Project = () => {
     const [projects, setProjects] = useState([]);
+    const [filteredProjects, setFilteredProjects] = useState([]); // Состояние для хранения отфильтрованных проектов
     const [accessToken, setAccessToken] = useState('');
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -48,6 +49,7 @@ const Project = () => {
                 if (response.ok) {
                     const data = await response.json();
                     setProjects(data);
+                    setFilteredProjects(data); // Инициализируем отфильтрованные проекты сначала равными всем проектам
                 } else {
                     console.error('Ошибка при получении проектов:', response.statusText);
                 }
@@ -242,6 +244,56 @@ const Project = () => {
         });
     };
 
+    // Функция для фильтрации проектов по имени заказчика
+    const handleFilterByCustomer = (customerId) => {
+        if (customerId === 'all') {
+            setFilteredProjects(projects); // Если выбрана опция "Все", показываем все проекты
+        } else {
+            const filtered = projects.filter(project => project.customer_id === parseInt(customerId)); // Преобразуем customerId в число
+            setFilteredProjects(filtered); // Иначе показываем только проекты выбранного заказчика
+        }
+    };
+
+    // Функция для сортировки проектов по дате начала проекта
+    const handleSortByStartDate = (direction) => {
+        const sortedProjects = [...filteredProjects].sort((a, b) => {
+            const dateA = new Date(a.start_date);
+            const dateB = new Date(b.start_date);
+            if (direction === 'asc') {
+                return dateA - dateB;
+            } else {
+                return dateB - dateA;
+            }
+        });
+        setFilteredProjects(sortedProjects);
+    };
+
+    // Функция для сортировки проектов по номеру проекта
+    const handleSortByProjectId = (direction) => {
+        const sortedProjects = [...filteredProjects].sort((a, b) => {
+            if (direction === 'asc') {
+                return a.project_id - b.project_id;
+            } else {
+                return b.project_id - a.project_id;
+            }
+        });
+        setFilteredProjects(sortedProjects);
+    };
+
+    // Функция для сортировки проектов по дате окончания проекта
+    const handleSortByEndDate = (direction) => {
+        const sortedProjects = [...filteredProjects].sort((a, b) => {
+            const dateA = new Date(a.end_date);
+            const dateB = new Date(b.end_date);
+            if (direction === 'asc') {
+                return dateA - dateB;
+            } else {
+                return dateB - dateA;
+            }
+        });
+        setFilteredProjects(sortedProjects);
+    };
+
     if (loading) {
         return <p>Загрузка...</p>;
     }
@@ -249,6 +301,32 @@ const Project = () => {
     return (
         <div>
             <h2>Проекты</h2>
+            <div>
+                <label>Поиск по заказчику:</label>
+                <select onChange={(e) => handleFilterByCustomer(e.target.value)}>
+                    <option value="all">Все</option>
+                    {customers.map(customer => (
+                        <option key={customer.customer_id} value={customer.customer_id}>
+                            {customer.customer_name}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div>
+                <label>Сортировка по дате начала проекта:</label>
+                <button onClick={() => handleSortByStartDate('asc')}>По возрастанию</button>
+                <button onClick={() => handleSortByStartDate('desc')}>По убыванию</button>
+            </div>
+            <div>
+                <label>Сортировка по номеру проекта:</label>
+                <button onClick={() => handleSortByProjectId('asc')}>По возрастанию</button>
+                <button onClick={() => handleSortByProjectId('desc')}>По убыванию</button>
+            </div>
+            <div>
+                <label>Сортировка по дате окончания проекта:</label>
+                <button onClick={() => handleSortByEndDate('asc')}>По возрастанию</button>
+                <button onClick={() => handleSortByEndDate('desc')}>По убыванию</button>
+            </div>
             <button onClick={handleOpenModal}>Добавить проект <FontAwesomeIcon icon={faPlus}/></button>
             {showModal && (
                 <Modal closeModal={handleCloseModal}>
@@ -296,7 +374,7 @@ const Project = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {projects.map((project, index) => (
+                {filteredProjects.map((project, index) => (
                     <tr key={index}>
                         <td>{project.project_id}</td>
                         <td>{project.project_name}</td>
