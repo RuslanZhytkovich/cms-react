@@ -1,25 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import './Home.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPenSquare, faPlus } from '@fortawesome/free-solid-svg-icons';
-
-const Modal = ({ children, closeModal }) => {
-    const handleModalClick = (e) => {
-        if (e.target === e.currentTarget) {
-            closeModal();
-        }
-    };
-
-    return (
-        <div className="modal" onClick={handleModalClick}>
-            <div className="modal-content">
-                <span className="close" onClick={closeModal}>&times;</span>
-                {children}
-            </div>
-        </div>
-    );
-};
-
+import Modal from "../../components/modal";
+import "../../App.css";
 
 const Home = () => {
     const [reports, setReports] = useState([]);
@@ -91,6 +74,7 @@ const Home = () => {
 
         fetchProjectNames();
     }, [reports]);
+
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -329,3 +313,4 @@ const Home = () => {
 };
 
 export default Home;
+

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faPenSquare, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faPenSquare } from '@fortawesome/free-solid-svg-icons';
 
 const Modal = ({ children, closeModal }) => {
     return (
@@ -120,9 +120,6 @@ const Users = () => {
         }
     };
 
-    const handleOpenModal = () => {
-        setShowModal(true);
-    };
 
     const handleCloseModal = () => {
         setShowModal(false);
