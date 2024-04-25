@@ -331,7 +331,6 @@ const Project = () => {
                 emptyMessage="Проектов не найдено."
                 className="custom-datatable"
             >
-                <Column field="project_id" header="Номер" sortable/>
                 <Column field="project_name" header="Название проекта" sortable/>
                 <Column field="start_date" header="Начало проекта" sortable/>
                 <Column field="end_date" header="Конец проекта" sortable/>
