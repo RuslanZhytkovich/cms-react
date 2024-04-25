@@ -1,13 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faPenSquare, faPlus } from '@fortawesome/free-solid-svg-icons'; // Иконки удаления, редактирования и добавления
+import { faTrash, faPenSquare, faPlus, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'; // Иконки удаления, редактирования и добавления
 import Modal from "../../components/modal";
+import "primereact/resources/themes/lara-light-indigo/theme.css"
+import "primereact/resources/primereact.min.css"
+
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column"
+import { FilterMatchMode } from "primereact/api";
+import { InputText } from "primereact/inputtext"
+
 
 const Specialization = () => {
     const [specializations, setSpecializations] = useState([]);
     const [accessToken, setAccessToken] = useState('');
     const [loading, setLoading] = useState(true);
+
     const [showModal, setShowModal] = useState(false);
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
     const [formData, setFormData] = useState({
         specialization_name: '',
     });
@@ -185,7 +197,8 @@ const Specialization = () => {
                     <form onSubmit={handleSubmit}>
                         <label>
                             Специализация:
-                            <input type="text" name="specialization_name" value={formData.specialization_name} onChange={handleChange} />
+                            <input type="text" name="specialization_name" value={formData.specialization_name}
+                                   onChange={handleChange}/>
                         </label>
                         {editingSpecializationId ? (
                             <button type="button" onClick={updateSpecialization}>Сохранить изменения</button>
@@ -195,35 +208,56 @@ const Specialization = () => {
                     </form>
                 </Modal>
             )}
-            <table className="table">
-                <thead>
-                <tr>
-                    <th>Номер</th>
-                    <th>Специализация</th>
-                    <th>Действие</th>
-                </tr>
-                </thead>
-                <tbody>
-                {specializations.map((specialization, index) => (
-                    <tr key={index}>
-                        <td>{specialization.specialization_id}</td>
-                        <td>{specialization.specialization_name}</td>
-                        <td className="icon-container">
-                            <FontAwesomeIcon
-                                className="icon"
-                                icon={faTrash}
-                                onClick={() => handleDeleteSpecialization(specialization.specialization_id)}
-                            />
-                            <FontAwesomeIcon
-                                className="icon"
-                                icon={faPenSquare}
-                                onClick={() => handleEditSpecialization(specialization.specialization_id)}
-                            />
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
+
+            <div style={{position: 'relative'}}>
+                <InputText
+                    style={{paddingLeft: '2rem',}}
+                    onInput={(e) => {
+                        setFilters({
+                            global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS},
+                        });
+                    }}
+                />
+                <FontAwesomeIcon
+                    className="icon"
+                    icon={faMagnifyingGlass}
+                    style={{position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)'}}
+                />
+            </div>
+
+
+            <DataTable
+                value={specializations}
+                sortMode="multiple"
+                paginator
+                rows={10}
+                filters={filters}
+                rowsPerPageOptions={[1,2,3,4,5,6,7,8,9,10]}
+                totalRows={specializations.length}
+                emptyMessage="Специализаций не найдено."
+                className="custom-datatable"
+            >
+                <Column field="specialization_id" header="Номер" sortable/>
+                <Column field="specialization_name" header="Специализация" sortable/>
+                <Column
+                    header="Действие"
+                    body={(rowData) => (
+                        <span className="icon-container">
+                <FontAwesomeIcon
+                    className="icon"
+                    icon={faTrash}
+                    onClick={() => handleDeleteSpecialization(rowData.specialization_id)}
+                />
+                <FontAwesomeIcon
+                    className="icon"
+                    icon={faPenSquare}
+                    onClick={() => handleEditSpecialization(rowData.specialization_id)}
+                />
+            </span>
+                    )}
+                />
+            </DataTable>
+
         </div>
     );
 };

@@ -2,6 +2,24 @@ h2 {
     margin-top: 100px; /* Замените значение на необходимое вам */
     color: white;
 }
+
+
+.icon-container {
+    color: #333; /* Цвет иконок */
+}
+
+.icon {
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+
+.icon:hover {
+    color: blue; /* Цвет при наведении */
+    transform: scale(1.1);
+}
+
 /* Стили для модального окна */
 .modal {
     position: fixed;
@@ -51,37 +69,3 @@ h2 {
 }
 
 
-.table{
-    border: 1px solid #eee;
-    table-layout: fixed;
-    width: 100%;
-    margin-bottom: 20px;
-}
-.table th {
-    font-weight: bold;
-    padding: 5px;
-    background: #efefef;
-    border: 1px solid #dddddd;
-}
-.table td{
-    padding: 5px 10px;
-    border: 1px solid #eee;
-    text-align: left;
-}
-.table tbody tr:nth-child(odd){
-    background: #fff;
-}
-.table tbody tr:nth-child(even){
-    background: #F7F7F7;
-}
-
-.table .icon-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.table .icon-container .icon {
-    margin-right: 100px;
-    cursor: pointer;
-}
