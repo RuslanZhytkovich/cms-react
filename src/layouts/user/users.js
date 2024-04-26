@@ -9,9 +9,12 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column"
 import { FilterMatchMode } from "primereact/api";
 import { InputText } from "primereact/inputtext"
+import {useNavigate} from "react-router-dom";
+import {fetchUserData} from "../../utils/profile-info";
 
 
 const Users = () => {
+    const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [accessToken, setAccessToken] = useState('');
     const [loading, setLoading] = useState(true);
@@ -33,6 +36,28 @@ const Users = () => {
         is_deleted: false,
     });
     const [editingUserId, setEditingUserId] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await fetchUserData();
+                console.log(data.current_user);
+
+                // Проверяем каждое поле на наличие значения
+                for (const key in data.current_user) {
+                    if (key !== 'on_bench' && !data.current_user[key]) {
+                        // Если хотя бы одно поле, кроме 'on_bench', пустое, выполняем редирект на страницу 'account'
+                        navigate('/account');
+                        return; // Завершаем выполнение цикла после первого пустого поля
+                    }
+                }
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     useEffect(() => {
         const fetchAccessToken = async () => {

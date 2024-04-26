@@ -6,27 +6,13 @@ import {faTrash, faPenSquare, faPlus, faMagnifyingGlass} from '@fortawesome/free
 import {InputText} from "primereact/inputtext";
 import {FilterMatchMode} from "primereact/api";
 import {DataTable} from "primereact/datatable";
-import {Column} from "primereact/column"; // Иконки удаления, редактирования и добавления
+import {Column} from "primereact/column";
+import {fetchUserData} from "../../utils/profile-info";
+import {useNavigate} from "react-router-dom"; // Иконки удаления, редактирования и добавления
 
 
-
-const Modal = ({ children, closeModal }) => {
-    const handleModalClick = (e) => {
-        if (e.target === e.currentTarget) {
-            closeModal();
-        }
-    };
-
-    return (
-        <div className="modal" onClick={handleModalClick}>
-            <div className="modal-content">
-                <span className="close" onClick={closeModal}>&times;</span>
-                {children}
-            </div>
-        </div>
-    );
-};
 const Customer = () => {
+    const navigate = useNavigate();
     const [customers, setCustomers] = useState([]);
     const [accessToken, setAccessToken] = useState('');
     const [loading, setLoading] = useState(true);
@@ -38,6 +24,28 @@ const Customer = () => {
         customer_name: '',
     });
     const [editingCustomerId, setEditingCustomerId] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await fetchUserData();
+                console.log(data.current_user);
+
+                // Проверяем каждое поле на наличие значения
+                for (const key in data.current_user) {
+                    if (key !== 'on_bench' && !data.current_user[key]) {
+                        // Если хотя бы одно поле, кроме 'on_bench', пустое, выполняем редирект на страницу 'account'
+                        navigate('/account');
+                        return; // Завершаем выполнение цикла после первого пустого поля
+                    }
+                }
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     useEffect(() => {
         const fetchAccessToken = async () => {

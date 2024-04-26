@@ -9,10 +9,12 @@ import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import "primereact/resources/themes/lara-light-indigo/theme.css"
 import "primereact/resources/primereact.min.css"
-
+import {fetchUserData} from "../../utils/profile-info";
+import {useNavigate} from "react-router-dom";
 
 
 const Home = () => {
+    const navigate = useNavigate();
     const [reports, setReports] = useState([]);
     const [accessToken, setAccessToken] = useState('');
     const [loading, setLoading] = useState(true);
@@ -27,9 +29,32 @@ const Home = () => {
         project_id: '',
     });
 
+
     const [editingReportId, setEditingReportId] = useState(null);
     const [projectNames, setProjectNames] = useState({});
     const [projects, setProjects] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await fetchUserData();
+                console.log(data.current_user);
+
+                // Проверяем каждое поле на наличие значения
+                for (const key in data.current_user) {
+                    if (key !== 'on_bench' && !data.current_user[key]) {
+                        // Если хотя бы одно поле, кроме 'on_bench', пустое, выполняем редирект на страницу 'account'
+                        navigate('/account');
+                        return; // Завершаем выполнение цикла после первого пустого поля
+                    }
+                }
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     useEffect(() => {
         const fetchAccessToken = async () => {
