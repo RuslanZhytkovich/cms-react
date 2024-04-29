@@ -11,7 +11,7 @@ import { FilterMatchMode } from "primereact/api";
 import { InputText } from "primereact/inputtext"
 import {fetchUserData} from "../../utils/profile-info";
 import {useNavigate} from "react-router-dom";
-
+import "../../App.css";
 
 
 const Project = () => {
@@ -291,6 +291,7 @@ const Project = () => {
 
     return (
         <div>
+            <div className="datatable">
             <h2>Проекты</h2>
             <button onClick={handleOpenModal}>Добавить проект <FontAwesomeIcon icon={faPlus}/></button>
             {showModal && (
@@ -345,7 +346,6 @@ const Project = () => {
                 />
             </div>
 
-
             <DataTable
                 value={projects}
                 sortMode="multiple"
@@ -385,6 +385,7 @@ const Project = () => {
                     )}
                 />
             </DataTable>
+            </div>
 
 
         </div>

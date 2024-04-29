@@ -11,7 +11,7 @@ import { FilterMatchMode } from "primereact/api";
 import { InputText } from "primereact/inputtext"
 import {useNavigate} from "react-router-dom";
 import {fetchUserData} from "../../utils/profile-info";
-
+import "../../App.css";
 
 const Users = () => {
     const navigate = useNavigate();
@@ -227,96 +227,96 @@ const Users = () => {
 
     return (
         <div>
-            <h2>Пользователи</h2>
-            {showModal && (
-                <Modal closeModal={handleCloseModal}>
-                    <form onSubmit={handleSubmit}>
+            <div className="datatable">
+                <h2>Пользователи</h2>
+                {showModal && (
+                    <Modal closeModal={handleCloseModal}>
+                        <form onSubmit={handleSubmit}>
 
-                        <label>
-                            Email:
-                            <input type="email" name="email" value={formData.email} onChange={handleChange}/>
-                        </label>
-                        <label>
-                            Роль:
-                            <select name="role" value={formData.role} onChange={handleChange}>
-                                <option value="">Выберите роль</option>
-                                <option value="admin">Администратор</option>
-                                <option value="user">Пользователь</option>
-                            </select>
-                        </label>
-                        <label>
-                            Удален ли:
-                            <input type="checkbox" name="is_deleted" checked={formData.is_deleted}
-                                   onChange={handleChange}/>
-                        </label>
-                        {editingUserId ? (
-                            <button onClick={handleSubmit}>Сохранить изменения</button>
-                        ) : (
-                            <button type="submit">Добавить пользователя</button>
+                            <label>
+                                Email:
+                                <input type="email" name="email" value={formData.email} onChange={handleChange}/>
+                            </label>
+                            <label>
+                                Роль:
+                                <select name="role" value={formData.role} onChange={handleChange}>
+                                    <option value="">Выберите роль</option>
+                                    <option value="admin">Администратор</option>
+                                    <option value="user">Пользователь</option>
+                                </select>
+                            </label>
+                            <label>
+                                Удален ли:
+                                <input type="checkbox" name="is_deleted" checked={formData.is_deleted}
+                                       onChange={handleChange}/>
+                            </label>
+                            {editingUserId ? (
+                                <button onClick={handleSubmit}>Сохранить изменения</button>
+                            ) : (
+                                <button type="submit">Добавить пользователя</button>
+                            )}
+                        </form>
+                    </Modal>
+                )}
+
+                <div style={{position: 'relative'}}>
+                    <InputText
+                        style={{paddingLeft: '2rem',}}
+                        onInput={(e) => {
+                            setFilters({
+                                global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS},
+                            });
+                        }}
+                    />
+                    <FontAwesomeIcon
+                        className="icon"
+                        icon={faMagnifyingGlass}
+                        style={{position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)'}}
+                    />
+                </div>
+
+                <DataTable
+                    value={users}
+                    sortMode="multiple"
+                    paginator
+                    rows={10}
+                    filters={filters}
+                    rowsPerPageOptions={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+                    totalRows={users.length}
+                    emptyMessage="Пользователи не найдены."
+                    className="custom-datatable"
+                >
+                    <Column
+                        header="Пользователь"
+                        body={(rowData) => (
+                            <span>{rowData.name} {rowData.last_name}</span>
                         )}
-                    </form>
-                </Modal>
-            )}
-
-            <div style={{position: 'relative'}}>
-                <InputText
-                    style={{paddingLeft: '2rem',}}
-                    onInput={(e) => {
-                        setFilters({
-                            global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS},
-                        });
-                    }}
-                />
-                <FontAwesomeIcon
-                    className="icon"
-                    icon={faMagnifyingGlass}
-                    style={{position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)'}}
-                />
-            </div>
-
-
-            <DataTable
-                value={users}
-                sortMode="multiple"
-                paginator
-                rows={10}
-                filters={filters}
-                rowsPerPageOptions={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
-                totalRows={users.length}
-                emptyMessage="Пользователи не найдены."
-                className="custom-datatable"
-            >
-                <Column
-                    header="Пользователь"
-                    body={(rowData) => (
-                        <span>{rowData.name} {rowData.last_name}</span>
-                    )}
-                    sortable
-                    sortField="name"
-                />
-                <Column field="email" header="Почта" sortable />
-                <Column field="telegram" header="Телеграм" sortable />
-                <Column field="phone_number" header="Телефон" sortable />
-                <Column
-                    header="Статус"
-                    body={(rowData) => (
-                        <span style={{ color: rowData.on_bench ? "red" : "black" }}>
+                        sortable
+                        sortField="name"
+                    />
+                    <Column field="email" header="Почта" sortable/>
+                    <Column field="telegram" header="Телеграм" sortable/>
+                    <Column field="phone_number" header="Телефон" sortable/>
+                    <Column
+                        header="Статус"
+                        body={(rowData) => (
+                            <span style={{color: rowData.on_bench ? "red" : "black"}}>
                 {rowData.on_bench ? "Без проекта" : "На проекте"}
             </span>
-                    )}
-                    sortable
-                    sortField="on_bench"
-                />
-                <Column
-                    field="specialization_id"
-                    header="Специализация"
-                    sortable
-                    body={(rowData) => `${specializationNames[rowData.user_id]}`}
-                />
-                <Column
-                    header="Действие"
-                    body={(rowData) => (
-                        <span className="icon-container">
+                        )}
+                        sortable
+                        sortField="on_bench"
+                    />
+                    <Column
+                        field="specialization_id"
+                        header="Специализация"
+                        sortable
+                        body={(rowData) => `${specializationNames[rowData.user_id]}`}
+                    />
+                    <Column
+                        header="Действие"
+                        body={(rowData) => (
+                            <span className="icon-container">
                 <FontAwesomeIcon
                     className="icon"
                     icon={faTrash}
@@ -328,12 +328,10 @@ const Users = () => {
                     onClick={() => handleEditUser(rowData.user_id)}
                 />
             </span>
-                    )}
-                />
-            </DataTable>
-
-
-
+                        )}
+                    />
+                </DataTable>
+            </div>
 
 
         </div>

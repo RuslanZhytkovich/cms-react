@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './account.css';
-import {alertTitleClasses} from "@mui/material";
 
 const Account = ({ navigate }) => {
     const [userData, setUserData] = useState(null);
@@ -100,13 +99,14 @@ const Account = ({ navigate }) => {
     };
 
     return (
-        <div className="container">
+        <div className="container" style={{marginTop: '10px', height: '930px'}}>
             <div className="header">
-                <div className="text">Аккаунт</div>
+                <div className="text">Профиль</div>
                 <div className="underline"></div>
                 {/* Выводим сообщение, если не все поля заполнены */}
-                {!allFieldsFilled && <div className="message" style={{ color: 'red' }}>Заполните все данные для дальнейшей работы</div>}
-                {allFieldsFilled && <div className="message" style={{ color: 'black' }}>Все данные заполнены</div>}
+                {!allFieldsFilled &&
+                    <div className="message" style={{color: 'red'}}>Заполните все данные для дальнейшей работы</div>}
+                {allFieldsFilled && <div className="message" style={{color: 'black'}}>Все данные заполнены</div>}
             </div>
             <div className="inputs">
                 {editableUserData && (
@@ -186,7 +186,8 @@ const Account = ({ navigate }) => {
                         >
                             <option value="">Выберите специализацию</option>
                             {specializations.map(spec => (
-                                <option key={spec.specialization_id} value={spec.specialization_id}>{spec.specialization_name}</option>
+                                <option key={spec.specialization_id}
+                                        value={spec.specialization_id}>{spec.specialization_name}</option>
                             ))}
                         </select>
                     </div>

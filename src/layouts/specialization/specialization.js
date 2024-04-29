@@ -11,9 +11,10 @@ import { FilterMatchMode } from "primereact/api";
 import { InputText } from "primereact/inputtext"
 import {useNavigate} from "react-router-dom";
 import {fetchUserData} from "../../utils/profile-info";
-
+import "../../App.css";
 
 const Specialization = () => {
+
     const navigate = useNavigate();
     const [specializations, setSpecializations] = useState([]);
     const [accessToken, setAccessToken] = useState('');
@@ -216,59 +217,60 @@ const Specialization = () => {
 
     return (
         <div>
-            <h2>Специализации</h2>
-            <button onClick={handleOpenModal}>Добавить специализацию <FontAwesomeIcon icon={faPlus}/></button>
-            {showModal && (
-                <Modal closeModal={handleCloseModal}>
-                    <form onSubmit={handleSubmit}>
-                        <label>
-                            Специализация:
-                            <input type="text" name="specialization_name" value={formData.specialization_name}
-                                   onChange={handleChange}/>
-                        </label>
-                        {editingSpecializationId ? (
-                            <button type="button" onClick={updateSpecialization}>Сохранить изменения</button>
-                        ) : (
-                            <button type="submit">Добавить специализацию</button>
-                        )}
-                    </form>
-                </Modal>
-            )}
+            <div className="datatable">
+                <h2>Специализации</h2>
+                <button onClick={handleOpenModal}>Добавить специализацию <FontAwesomeIcon icon={faPlus}/></button>
+                {showModal && (
+                    <Modal closeModal={handleCloseModal}>
+                        <form onSubmit={handleSubmit}>
+                            <label>
+                                Специализация:
+                                <input type="text" name="specialization_name" value={formData.specialization_name}
+                                       onChange={handleChange}/>
+                            </label>
+                            {editingSpecializationId ? (
+                                <button type="button" onClick={updateSpecialization}>Сохранить изменения</button>
+                            ) : (
+                                <button type="submit">Добавить специализацию</button>
+                            )}
+                        </form>
+                    </Modal>
+                )}
 
-            <div style={{position: 'relative'}}>
-                <InputText
-                    style={{paddingLeft: '2rem',}}
-                    onInput={(e) => {
-                        setFilters({
-                            global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS},
-                        });
-                    }}
-                />
-                <FontAwesomeIcon
-                    className="icon"
-                    icon={faMagnifyingGlass}
-                    style={{position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)'}}
-                />
-            </div>
+                <div style={{position: 'relative'}}>
+                    <InputText
+                        style={{paddingLeft: '2rem',}}
+                        onInput={(e) => {
+                            setFilters({
+                                global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS},
+                            });
+                        }}
+                    />
+                    <FontAwesomeIcon
+                        className="icon"
+                        icon={faMagnifyingGlass}
+                        style={{position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)'}}
+                    />
+                </div>
 
 
-            <DataTable
-                value={specializations}
-                sortMode="multiple"
-                paginator
-                rows={10}
-                filters={filters}
-                rowsPerPageOptions={[1,2,3,4,5,6,7,8,9,10]}
-                totalRows={specializations.length}
-                emptyMessage="Специализаций не найдено."
-                className="custom-datatable"
-            >
-                <Column field="specialization_id" header="Номер" sortable/>
-                <Column field="specialization_name" header="Специализация" sortable/>
-                <Column
-                    header="Действие"
-                    body={(rowData) => (
-                        <span className="icon-container">
+                <DataTable
+                    value={specializations}
+                    sortMode="multiple"
+                    paginator
+                    rows={10}
+                    filters={filters}
+                    rowsPerPageOptions={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+                    totalRows={specializations.length}
+                    emptyMessage="Специализаций не найдено."
+                    className="custom-datatable"
+                >
+                    <Column field="specialization_id" header="Номер" sortable/>
+                    <Column field="specialization_name" header="Специализация" sortable/>
+                    <Column
+                        header="Действие"
+                        body={(rowData) => (
+                            <span className="icon-container">
                 <FontAwesomeIcon
                     className="icon"
                     icon={faTrash}
@@ -280,9 +282,10 @@ const Specialization = () => {
                     onClick={() => handleEditSpecialization(rowData.specialization_id)}
                 />
             </span>
-                    )}
-                />
-            </DataTable>
+                        )}
+                    />
+                </DataTable>
+            </div>
 
         </div>
     );

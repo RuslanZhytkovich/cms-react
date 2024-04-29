@@ -69,3 +69,26 @@ h2 {
 }
 
 
+.datatable {
+    margin-left: 205px; /* Установите значение отступа, учитывая ширину боковой панели */
+}
+
+
+body{
+    background: #171717;
+}
+
+
+.createbtn {
+    height: 50%;
+    border-radius: 5px;
+    width: 600px;
+}
+
+.buttons-upper-table{
+    margin-left: 10px;
+    height: 100px;
+    background-color: #292929;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}

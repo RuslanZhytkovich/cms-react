@@ -9,7 +9,8 @@ import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {fetchUserData} from "../../utils/profile-info";
 import {useNavigate} from "react-router-dom"; // Иконки удаления, редактирования и добавления
-
+import Modal from "../../components/modal";
+import "../../App.css";
 
 const Customer = () => {
     const navigate = useNavigate();
@@ -213,6 +214,7 @@ const Customer = () => {
 
     return (
         <div>
+            <div className="datatable">
             <h2>Заказчики</h2>
             <button onClick={handleOpenModal}>Добавить заказчика <FontAwesomeIcon icon={faPlus}/></button>
             {showModal && (
@@ -247,7 +249,6 @@ const Customer = () => {
                 />
             </div>
 
-
             <DataTable
                 value={customers}
                 sortMode="multiple"
@@ -279,6 +280,7 @@ const Customer = () => {
                     )}
                 />
             </DataTable>
+            </div>
 
         </div>
     );

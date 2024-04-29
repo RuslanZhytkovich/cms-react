@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faTrash, faPenSquare, faPlus, faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
+import {faTrash, faPenSquare, faPlus, faMagnifyingGlass, faTimes} from '@fortawesome/free-solid-svg-icons';
 import Modal from "../../components/modal";
 import "../../App.css";
 import {InputText} from "primereact/inputtext";
@@ -238,6 +238,10 @@ const Home = () => {
         setShowModal(false);
     };
 
+    const clearSearch = () => {
+        setFilters({ global: { value: '', matchMode: FilterMatchMode.CONTAINS } });
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -280,80 +284,96 @@ const Home = () => {
 
     return (
         <div>
-            <h2>Отчеты</h2>
-            <button onClick={handleOpenModal}>Создать отчет <FontAwesomeIcon icon={faPlus}/></button>
-            {showModal && (
-                <Modal closeModal={handleCloseModal}>
-                    <form onSubmit={handleSubmit}>
-                        <label>
-                            Дата:
-                            <input type="date" name="date" value={formData.date} onChange={handleChange}/>
-                        </label>
-                        <label>
-                            Часы:
-                            <input type="number" name="hours" value={formData.hours} onChange={handleChange} min="0"
-                                   max="24"/>
-                        </label>
-                        <label>
-                            Описание:
-                            <input type="text" name="comment" value={formData.comment} onChange={handleChange}/>
-                        </label>
-                        <label>
-                            Проект:
-                            <select name="project_id" value={formData.project_id} onChange={handleChange}>
-                                <option value="">Выберите проект</option>
-                                {projects.map((project) => (
-                                    <option key={project.project_id}
-                                            value={project.project_id}>{project.project_name}</option>
-                                ))}
-                            </select>
-                        </label>
-                        <button type="submit">Создать</button>
-                    </form>
-                </Modal>
-            )}
+            <div className="datatable">
+                {showModal && (
+                    <Modal closeModal={handleCloseModal}>
+                        <form onSubmit={handleSubmit}>
+                            <label>
+                                Дата:
+                                <input type="date" name="date" value={formData.date} onChange={handleChange}/>
+                            </label>
+                            <label>
+                                Часы:
+                                <input type="number" name="hours" value={formData.hours} onChange={handleChange} min="0"
+                                       max="24"/>
+                            </label>
+                            <label>
+                                Описание:
+                                <input type="text" name="comment" value={formData.comment} onChange={handleChange}/>
+                            </label>
+                            <label>
+                                Проект:
+                                <select name="project_id" value={formData.project_id} onChange={handleChange}>
+                                    <option value="">Выберите проект</option>
+                                    {projects.map((project) => (
+                                        <option key={project.project_id}
+                                                value={project.project_id}>{project.project_name}</option>
+                                    ))}
+                                </select>
+                            </label>
+                            <button type="submit">Создать</button>
+                        </form>
+                    </Modal>
+                )}
 
-            <div style={{position: 'relative'}}>
-                <InputText
-                    style={{paddingLeft: '2rem',}}
-                    onInput={(e) => {
-                        setFilters({
-                            global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS},
-                        });
-                    }}
-                />
-                <FontAwesomeIcon
-                    className="icon"
-                    icon={faMagnifyingGlass}
-                    style={{position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)'}}
-                />
-            </div>
+                <div className="buttons-upper-table">
+                    <button
+                        className="createbtn"
+                        onClick={handleOpenModal}
+                    >
+                        <FontAwesomeIcon icon={faPlus}/>
+                        Создать отчет
+                    </button>
+                    <div className="search-prompt" style={{position: 'relative', width: 'calc(100% - 120px)'}}>
+                        <InputText
+                            placeholder="Напишите что-нибудь"
+                            style={{borderRadius: '5px', width: '40%', marginLeft: '50px', paddingLeft: '30px'}}
+                            value={filters.global.value}
+                            onChange={(e) => setFilters({
+                                global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS}
+                            })}
+                        />
+                        {filters.global.value && (
+                            <FontAwesomeIcon
+                                icon={faTimes}
+                                onClick={clearSearch}
+                                style={{ position: 'absolute', left: '450px', top: '50%', transform: 'translateY(-50%)' }}
+                            />
+
+                        )}
+                        <FontAwesomeIcon
+                            className="icon"
+                            icon={faMagnifyingGlass}
+                            style={{position: 'absolute', left: '55px', top: '50%', transform: 'translateY(-50%)'}}
+                        />
+                    </div>
+                </div>
 
 
-            <DataTable
-                value={reports}
-                sortMode="multiple"
-                paginator
-                rows={10}
-                filters={filters}
-                rowsPerPageOptions={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
-                totalRows={reports.length}
-                emptyMessage="Отчетов не найдено."
-                className="custom-datatable"
-            >
-                <Column field="date" header="Дата" sortable/>
-                <Column field="hours" header="Часы" sortable/>
-                <Column field="comment" header="Описание" sortable/>
-                <Column
-                    field="project_id"
-                    header="Проект"
-                    sortable
-                    body={(rowData) => `${projectNames[rowData.report_id]}`}
-                />
-                <Column
-                    header="Действие"
-                    body={(rowData) => (
-                        <span className="icon-container">
+                <DataTable
+                    value={reports}
+                    sortMode="multiple"
+                    paginator
+                    rows={10}
+                    filters={filters}
+                    rowsPerPageOptions={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+                    totalRows={reports.length}
+                    emptyMessage="Отчетов не найдено."
+                    className="custom-datatable"
+                >
+                    <Column field="date" header="Дата" sortable/>
+                    <Column field="hours" header="Часы" sortable/>
+                    <Column field="comment" header="Описание" sortable/>
+                    <Column
+                        field="project_id"
+                        header="Проект"
+                        sortable
+                        body={(rowData) => `${projectNames[rowData.report_id]}`}
+                    />
+                    <Column
+                        header="Действие"
+                        body={(rowData) => (
+                            <span className="icon-container">
                 <FontAwesomeIcon
                     className="icon"
                     icon={faTrash}
@@ -365,9 +385,10 @@ const Home = () => {
                     onClick={() => handleEditReport(rowData.report_id)}
                 />
             </span>
-                    )}
-                />
-            </DataTable>
+                        )}
+                    />
+                </DataTable>
+            </div>
         </div>
     );
 };
