@@ -321,8 +321,8 @@ const Home = () => {
                         className="createbtn"
                         onClick={handleOpenModal}
                     >
-                        <FontAwesomeIcon icon={faPlus}/>
-                        Создать отчет
+                        <FontAwesomeIcon icon={faPlus} style={{ marginRight: '20px' }} />
+                         Создать отчет
                     </button>
                     <div className="search-prompt" style={{position: 'relative', width: 'calc(100% - 120px)'}}>
                         <InputText
@@ -337,7 +337,7 @@ const Home = () => {
                             <FontAwesomeIcon
                                 icon={faTimes}
                                 onClick={clearSearch}
-                                style={{ position: 'absolute', left: '450px', top: '50%', transform: 'translateY(-50%)' }}
+                                style={{ position: 'absolute', left: '430px', top: '50%', transform: 'translateY(-50%)' }}
                             />
 
                         )}

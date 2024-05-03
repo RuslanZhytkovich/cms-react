@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faPenSquare, faPlus, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'; // Иконки удаления, редактирования и добавления
+import {faTrash, faPenSquare, faPlus, faMagnifyingGlass, faTimes} from '@fortawesome/free-solid-svg-icons'; // Иконки удаления, редактирования и добавления
 import Modal from "../../components/modal";
 import "primereact/resources/themes/lara-light-indigo/theme.css"
 import "primereact/resources/primereact.min.css"
@@ -27,6 +27,11 @@ const Specialization = () => {
     const [formData, setFormData] = useState({
         specialization_name: '',
     });
+
+    const clearSearch = () => {
+        setFilters({ global: { value: '', matchMode: FilterMatchMode.CONTAINS } });
+    };
+
     const [editingSpecializationId, setEditingSpecializationId] = useState(null);
 
     useEffect(() => {
@@ -218,8 +223,6 @@ const Specialization = () => {
     return (
         <div>
             <div className="datatable">
-                <h2>Специализации</h2>
-                <button onClick={handleOpenModal}>Добавить специализацию <FontAwesomeIcon icon={faPlus}/></button>
                 {showModal && (
                     <Modal closeModal={handleCloseModal}>
                         <form onSubmit={handleSubmit}>
@@ -237,20 +240,38 @@ const Specialization = () => {
                     </Modal>
                 )}
 
-                <div style={{position: 'relative'}}>
-                    <InputText
-                        style={{paddingLeft: '2rem',}}
-                        onInput={(e) => {
-                            setFilters({
-                                global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS},
-                            });
-                        }}
-                    />
-                    <FontAwesomeIcon
-                        className="icon"
-                        icon={faMagnifyingGlass}
-                        style={{position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)'}}
-                    />
+
+                <div className="buttons-upper-table">
+                    <button
+                        className="createbtn"
+                        onClick={handleOpenModal}
+                    >
+                        <FontAwesomeIcon icon={faPlus} style={{marginRight: '20px'}}/>
+                        Добавить специализацию
+                    </button>
+                    <div className="search-prompt" style={{position: 'relative', width: 'calc(100% - 120px)'}}>
+                        <InputText
+                            placeholder="Напишите что-нибудь"
+                            style={{borderRadius: '5px', width: '40%', marginLeft: '50px', paddingLeft: '30px'}}
+                            value={filters.global.value}
+                            onChange={(e) => setFilters({
+                                global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS}
+                            })}
+                        />
+                        {filters.global.value && (
+                            <FontAwesomeIcon
+                                icon={faTimes}
+                                onClick={clearSearch}
+                                style={{position: 'absolute', left: '430px', top: '50%', transform: 'translateY(-50%)'}}
+                            />
+
+                        )}
+                        <FontAwesomeIcon
+                            className="icon"
+                            icon={faMagnifyingGlass}
+                            style={{position: 'absolute', left: '55px', top: '50%', transform: 'translateY(-50%)'}}
+                        />
+                    </div>
                 </div>
 
 

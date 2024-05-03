@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faPenSquare, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import {faTrash, faPenSquare, faMagnifyingGlass, faPlus, faTimes} from '@fortawesome/free-solid-svg-icons';
 import Modal from "../../components/modal";
 import "primereact/resources/themes/lara-light-indigo/theme.css"
 import "primereact/resources/primereact.min.css"
@@ -153,6 +153,10 @@ const Users = () => {
         }
     };
 
+    const clearSearch = () => {
+        setFilters({ global: { value: '', matchMode: FilterMatchMode.CONTAINS } });
+    };
+
     const handleEditUser = async (userId) => {
         setEditingUserId(userId);
         const userToEdit = users.find(user => user.id === userId);
@@ -178,6 +182,7 @@ const Users = () => {
         });
         setShowModal(false);
     };
+
 
     const updateUser = async () => {
         try {
@@ -228,7 +233,6 @@ const Users = () => {
     return (
         <div>
             <div className="datatable">
-                <h2>Пользователи</h2>
                 {showModal && (
                     <Modal closeModal={handleCloseModal}>
                         <form onSubmit={handleSubmit}>
@@ -259,48 +263,58 @@ const Users = () => {
                     </Modal>
                 )}
 
-                <div style={{position: 'relative'}}>
-                    <InputText
-                        style={{paddingLeft: '2rem',}}
-                        onInput={(e) => {
-                            setFilters({
-                                global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS},
-                            });
-                        }}
-                    />
-                    <FontAwesomeIcon
-                        className="icon"
-                        icon={faMagnifyingGlass}
-                        style={{position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)'}}
-                    />
-                </div>
+                <div className="buttons-upper-table">
+                    <div className="search-prompt" style={{ right: "160px", width: 'calc(100% - 320px)'}}>
+                        <InputText
+                            placeholder="Напишите что-нибудь"
+                            style={{borderRadius: '5px', width: '40%', marginLeft: '50px', paddingLeft: '30px'}}
+                            value={filters.global.value}
+                            onChange={(e) => setFilters({
+                                global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS}
+                            })}
+                        />
+                        {filters.global.value && (
+                            <FontAwesomeIcon
+                                icon={faTimes}
+                                onClick={clearSearch}
+                                style={{ marginLeft: '-20px', top: '50%'}}
+                            />
 
+                        )}
+                        <FontAwesomeIcon
+                            className="icon"
+                            icon={faMagnifyingGlass}
+                            style={{position: 'absolute', left: '54px', top: '50%', transform: 'translateY(-50%)'}}
+                        />
+                    </div>
+                </div>
                 <DataTable
                     value={users}
                     sortMode="multiple"
                     paginator
                     rows={10}
-                    filters={filters}
                     rowsPerPageOptions={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
                     totalRows={users.length}
                     emptyMessage="Пользователи не найдены."
                     className="custom-datatable"
+                    filters={filters}
+                    onFilter={(e) => {
+                        const value = e.target.value.toLowerCase();
+                        setFilters({
+                            ...filters,
+                            global: { value: value, matchMode: 'contains' }
+                        });
+                    }}
                 >
-                    <Column
-                        header="Пользователь"
-                        body={(rowData) => (
-                            <span>{rowData.name} {rowData.last_name}</span>
-                        )}
-                        sortable
-                        sortField="name"
-                    />
-                    <Column field="email" header="Почта" sortable/>
-                    <Column field="telegram" header="Телеграм" sortable/>
-                    <Column field="phone_number" header="Телефон" sortable/>
+                    <Column field="name" header="Имя" sortable />
+                    <Column field="last_name" header="Фамилия" sortable />
+                    <Column field="email" header="Почта" sortable />
+                    <Column field="telegram" header="Телеграм" sortable />
+                    <Column field="phone_number" header="Телефон" sortable />
                     <Column
                         header="Статус"
                         body={(rowData) => (
-                            <span style={{color: rowData.on_bench ? "red" : "black"}}>
+                            <span style={{ color: rowData.on_bench ? "red" : "black" }}>
                 {rowData.on_bench ? "Без проекта" : "На проекте"}
             </span>
                         )}
@@ -331,6 +345,9 @@ const Users = () => {
                         )}
                     />
                 </DataTable>
+
+
+
             </div>
 
 

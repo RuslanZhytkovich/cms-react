@@ -73,8 +73,6 @@ button:hover {
     justify-content: center;
     align-items: center;
     height: 100px;
-    background-color: #292929;
-    margin-bottom: 20px;
     margin-top: 20px;
     border-radius: 10px;
 }

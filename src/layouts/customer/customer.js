@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import "primereact/resources/themes/lara-light-indigo/theme.css"
 import "primereact/resources/primereact.min.css"
-import {faTrash, faPenSquare, faPlus, faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
+import {faTrash, faPenSquare, faPlus, faMagnifyingGlass, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {InputText} from "primereact/inputtext";
 import {FilterMatchMode} from "primereact/api";
 import {DataTable} from "primereact/datatable";
@@ -160,6 +160,10 @@ const Customer = () => {
         }
     };
 
+    const clearSearch = () => {
+        setFilters({ global: { value: '', matchMode: FilterMatchMode.CONTAINS } });
+    };
+
     // Обработчик для открытия модального окна
     const handleOpenModal = () => {
         setShowModal(true);
@@ -215,57 +219,73 @@ const Customer = () => {
     return (
         <div>
             <div className="datatable">
-            <h2>Заказчики</h2>
-            <button onClick={handleOpenModal}>Добавить заказчика <FontAwesomeIcon icon={faPlus}/></button>
-            {showModal && (
-                <Modal closeModal={handleCloseModal}>
-                    <form onSubmit={handleSubmit}>
-                        <label>
-                            Имя заказчика:
-                            <input type="text" name="customer_name" value={formData.customer_name}
-                                   onChange={handleChange}/>
-                        </label>
-                        {editingCustomerId ? (
-                            <button onClick={updateCustomer}>Сохранить изменения</button>
-                        ) : (
-                            <button type="submit">Добавить заказчика</button>
-                        )}
-                    </form>
-                </Modal>
-            )}
-            <div style={{position: 'relative'}}>
-                <InputText
-                    style={{paddingLeft: '2rem',}}
-                    onInput={(e) => {
-                        setFilters({
-                            global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS},
-                        });
-                    }}
-                />
-                <FontAwesomeIcon
-                    className="icon"
-                    icon={faMagnifyingGlass}
-                    style={{position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)'}}
-                />
-            </div>
+                {showModal && (
+                    <Modal closeModal={handleCloseModal}>
+                        <form onSubmit={handleSubmit}>
+                            <label>
+                                Имя заказчика:
+                                <input type="text" name="customer_name" value={formData.customer_name}
+                                       onChange={handleChange}/>
+                            </label>
+                            {editingCustomerId ? (
+                                <button onClick={updateCustomer}>Сохранить изменения</button>
+                            ) : (
+                                <button type="submit">Добавить заказчика</button>
+                            )}
+                        </form>
+                    </Modal>
+                )}
 
-            <DataTable
-                value={customers}
-                sortMode="multiple"
-                paginator
-                rows={10}
-                filters={filters}
-                rowsPerPageOptions={[1,2,3,4,5,6,7,8,9,10]}
-                totalRows={customers.length}
-                emptyMessage="Заказчиков не найдено."
-                className="custom-datatable"
-            >
-                <Column field="customer_id" header="Номер" sortable/>
-                <Column field="customer_name" header="Заказчик" sortable/>
-                <Column
-                    header="Действие"
-                    body={(rowData) => (
-                        <span className="icon-container">
+                <div className="buttons-upper-table">
+                    <button
+                        className="createbtn"
+                        onClick={handleOpenModal}
+                    >
+                        <FontAwesomeIcon icon={faPlus} style={{marginRight: '20px'}}/>
+                        Добавить заказчика
+                    </button>
+                    <div className="search-prompt" style={{position: 'relative', width: 'calc(100% - 120px)'}}>
+                        <InputText
+                            placeholder="Напишите что-нибудь"
+                            style={{borderRadius: '5px', width: '40%', marginLeft: '50px', paddingLeft: '30px'}}
+                            value={filters.global.value}
+                            onChange={(e) => setFilters({
+                                global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS}
+                            })}
+                        />
+                        {filters.global.value && (
+                            <FontAwesomeIcon
+                                icon={faTimes}
+                                onClick={clearSearch}
+                                style={{position: 'absolute', left: '430px', top: '50%', transform: 'translateY(-50%)'}}
+                            />
+
+                        )}
+                        <FontAwesomeIcon
+                            className="icon"
+                            icon={faMagnifyingGlass}
+                            style={{position: 'absolute', left: '55px', top: '50%', transform: 'translateY(-50%)'}}
+                        />
+                    </div>
+                </div>
+
+                <DataTable
+                    value={customers}
+                    sortMode="multiple"
+                    paginator
+                    rows={10}
+                    filters={filters}
+                    rowsPerPageOptions={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+                    totalRows={customers.length}
+                    emptyMessage="Заказчиков не найдено."
+                    className="custom-datatable"
+                >
+                    <Column field="customer_id" header="Номер" sortable/>
+                    <Column field="customer_name" header="Заказчик" sortable/>
+                    <Column
+                        header="Действие"
+                        body={(rowData) => (
+                            <span className="icon-container">
                 <FontAwesomeIcon
                     className="icon"
                     icon={faTrash}
@@ -277,9 +297,9 @@ const Customer = () => {
                     onClick={() => handleEditCustomer(rowData.customer_id)}
                 />
             </span>
-                    )}
-                />
-            </DataTable>
+                        )}
+                    />
+                </DataTable>
             </div>
 
         </div>

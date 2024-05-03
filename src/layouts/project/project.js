@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faPenSquare, faPlus,faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import {faTrash, faPenSquare, faPlus, faMagnifyingGlass, faTimes} from '@fortawesome/free-solid-svg-icons';
 import Modal from "../../components/modal";
 import "primereact/resources/themes/lara-light-indigo/theme.css"
 import "primereact/resources/primereact.min.css"
@@ -236,6 +236,10 @@ const Project = () => {
         }
     };
 
+    const clearSearch = () => {
+        setFilters({ global: { value: '', matchMode: FilterMatchMode.CONTAINS } });
+    };
+
     const handleOpenModal = () => {
         setShowModal(true);
     };
@@ -281,10 +285,6 @@ const Project = () => {
     };
 
 
-
-
-
-
     if (loading) {
         return <p>Загрузка...</p>;
     }
@@ -292,85 +292,102 @@ const Project = () => {
     return (
         <div>
             <div className="datatable">
-            <h2>Проекты</h2>
-            <button onClick={handleOpenModal}>Добавить проект <FontAwesomeIcon icon={faPlus}/></button>
-            {showModal && (
-                <Modal closeModal={handleCloseModal}>
-                    <form onSubmit={handleSubmit}>
-                        <label>
-                            Название проекта:
-                            <input type="text" name="project_name" value={formData.project_name}
-                                   onChange={handleChange}/>
-                        </label>
-                        <label>
-                            Начало проекта:
-                            <input type="date" name="start_date" value={formData.start_date} onChange={handleChange}/>
-                        </label>
-                        <label>
-                            Конец проекта:
-                            <input type="date" name="end_date" value={formData.end_date} onChange={handleChange}/>
-                        </label>
-                        <label>
-                            Заказчик:
-                            <select name="customer_id" value={formData.customer_id} onChange={handleChange}>
-                                <option value="">Выберите заказчика</option>
-                                {customers.map(customer => (
-                                    <option key={customer.customer_id} value={customer.customer_id}>
-                                        {customer.customer_name}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-                        {editingProjectId ? (
-                            <button onClick={handleSubmit}>Сохранить изменения</button>
-                        ) : (
-                            <button type="submit">Добавить проект</button>
+                {showModal && (
+                    <Modal closeModal={handleCloseModal}>
+                        <form onSubmit={handleSubmit}>
+                            <label>
+                                Название проекта:
+                                <input type="text" name="project_name" value={formData.project_name}
+                                       onChange={handleChange}/>
+                            </label>
+                            <label>
+                                Начало проекта:
+                                <input type="date" name="start_date" value={formData.start_date}
+                                       onChange={handleChange}/>
+                            </label>
+                            <label>
+                                Конец проекта:
+                                <input type="date" name="end_date" value={formData.end_date} onChange={handleChange}/>
+                            </label>
+                            <label>
+                                Заказчик:
+                                <select name="customer_id" value={formData.customer_id} onChange={handleChange}>
+                                    <option value="">Выберите заказчика</option>
+                                    {customers.map(customer => (
+                                        <option key={customer.customer_id} value={customer.customer_id}>
+                                            {customer.customer_name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            {editingProjectId ? (
+                                <button onClick={handleSubmit}>Сохранить изменения</button>
+                            ) : (
+                                <button type="submit">Добавить проект</button>
+                            )}
+                        </form>
+                    </Modal>
+                )}
+
+
+                <div className="buttons-upper-table">
+                    <button
+                        className="createbtn"
+                        onClick={handleOpenModal}
+                    >
+                        <FontAwesomeIcon icon={faPlus} style={{marginRight: '20px'}}/>
+                        Добавить проект
+                    </button>
+                    <div className="search-prompt" style={{position: 'relative', width: 'calc(100% - 120px)'}}>
+                        <InputText
+                            placeholder="Напишите что-нибудь"
+                            style={{borderRadius: '5px', width: '40%', marginLeft: '50px', paddingLeft: '30px'}}
+                            value={filters.global.value}
+                            onChange={(e) => setFilters({
+                                global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS}
+                            })}
+                        />
+                        {filters.global.value && (
+                            <FontAwesomeIcon
+                                icon={faTimes}
+                                onClick={clearSearch}
+                                style={{position: 'absolute', left: '430px', top: '50%', transform: 'translateY(-50%)'}}
+                            />
+
                         )}
-                    </form>
-                </Modal>
-            )}
+                        <FontAwesomeIcon
+                            className="icon"
+                            icon={faMagnifyingGlass}
+                            style={{position: 'absolute', left: '55px', top: '50%', transform: 'translateY(-50%)'}}
+                        />
+                    </div>
+                </div>
 
-            <div style={{position: 'relative'}}>
-                <InputText
-                    style={{paddingLeft: '2rem',}}
-                    onInput={(e) => {
-                        setFilters({
-                            global: {value: e.target.value, matchMode: FilterMatchMode.CONTAINS},
-                        });
-                    }}
-                />
-                <FontAwesomeIcon
-                    className="icon"
-                    icon={faMagnifyingGlass}
-                    style={{position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)'}}
-                />
-            </div>
-
-            <DataTable
-                value={projects}
-                sortMode="multiple"
-                paginator
-                rows={10}
-                filters={filters}
-                rowsPerPageOptions={[1,2,3,4,5,6,7,8,9,10]}
-                totalRows={projects.length}
-                emptyMessage="Проектов не найдено."
-                className="custom-datatable"
-            >
-                <Column field="project_name" header="Название проекта" sortable/>
-                <Column field="start_date" header="Начало проекта" sortable/>
-                <Column field="end_date" header="Конец проекта" sortable/>
-                <Column
-                    field="customer_id"
-                    header="Заказчик"
-                    sortable
-                    body={(rowData) => `${customerNames[rowData.project_id]}`}
+                <DataTable
+                    value={projects}
+                    sortMode="multiple"
+                    paginator
+                    rows={10}
+                    filters={filters}
+                    rowsPerPageOptions={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+                    totalRows={projects.length}
+                    emptyMessage="Проектов не найдено."
+                    className="custom-datatable"
+                >
+                    <Column field="project_name" header="Название проекта" sortable/>
+                    <Column field="start_date" header="Начало проекта" sortable/>
+                    <Column field="end_date" header="Конец проекта" sortable/>
+                    <Column
+                        field="customer_id"
+                        header="Заказчик"
+                        sortable
+                        body={(rowData) => `${customerNames[rowData.project_id]}`}
                     />
 
-                <Column
-                    header="Действие"
-                    body={(rowData) => (
-                        <span className="icon-container">
+                    <Column
+                        header="Действие"
+                        body={(rowData) => (
+                            <span className="icon-container">
                 <FontAwesomeIcon
                     className="icon"
                     icon={faTrash}
@@ -382,9 +399,9 @@ const Project = () => {
                     onClick={() => handleEditProject(rowData.project_id)}
                 />
             </span>
-                    )}
-                />
-            </DataTable>
+                        )}
+                    />
+                </DataTable>
             </div>
 
 

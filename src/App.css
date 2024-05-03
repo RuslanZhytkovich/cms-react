@@ -83,12 +83,21 @@ body{
     height: 50%;
     border-radius: 5px;
     width: 600px;
+    margin-left: 50px;
+    transition: transform 0.5s ease-in-out;
 }
 
 .buttons-upper-table{
-    margin-left: 10px;
     height: 100px;
     background-color: #292929;
     margin-bottom: 20px;
     margin-top: 20px;
+}
+
+.buttons-upper-table button{
+    font-size: 17px;
+}
+
+.createbtn:hover {
+    transform: scale(1.1);
 }
