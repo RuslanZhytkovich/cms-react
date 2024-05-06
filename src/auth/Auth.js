@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import React, {useEffect, useRef, useState} from "react";
+import {Navigate, useLocation, useNavigate} from "react-router-dom";
+import {fetchUserData} from "../utils/profile-info";
 
 export const setRefreshTokenToCookie = (refreshToken) => {
     document.cookie = `refreshToken=${refreshToken}; path=/; secure; samesite=strict`;
@@ -82,3 +83,50 @@ export function RequireToken({ children }) {
 
     return children;
 }
+
+
+export function RequireRole({ children }) {
+    const [auth, setAuth] = useState(null);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const [userRole, setUserRole] = useState(null);
+    const alertShown = useRef(false); // useRef для отслеживания вызова alert
+
+    useEffect(() => {
+        const fetchAuth = async () => {
+            const isAuthenticated = await fetchToken();
+            setAuth(isAuthenticated);
+        };
+        fetchAuth();
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await fetchUserData();
+                const role = data['current_user'].role;
+                setUserRole(role);
+                console.log(role);
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+        fetchData();
+    }, []);
+
+
+
+    if (auth === null) {
+        return <div>Loading...</div>;
+    }
+
+    if (userRole === "developer" && !alertShown.current) {
+        alertShown.current = true;
+        navigate('/home');
+        alert('Запрещено в доступе!');
+    }
+
+    return children;
+}
+
+

@@ -51,17 +51,14 @@ button:hover {
     transform: scale(1.1);
 }
 
-.logout-button-container {
-    margin-top: 450px;
-}
-
 .logout-button {
     background: none;
     border: none;
     color: #fff;
     font-size: 16px;
     transition: all 0.3s ease;
-    margin-left: 30px;
+    margin-left: 25px;
+    margin-top: 10px;
 }
 
 .logout-button:hover {
@@ -82,4 +79,3 @@ button:hover {
     width: 500px; /* Ширина поля ввода */
     border-radius: 5px;
 }
-

@@ -38,7 +38,6 @@ const Home = () => {
         const fetchData = async () => {
             try {
                 const data = await fetchUserData();
-                console.log(data.current_user);
 
                 // Проверяем каждое поле на наличие значения
                 for (const key in data.current_user) {
