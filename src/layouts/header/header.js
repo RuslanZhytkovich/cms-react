@@ -25,7 +25,7 @@ const Header = () => {
                 </ul>
             </nav>
             <div className="logout-button-container">
-            <button className="logout-button" onClick={logout}><FontAwesomeIcon icon={faArrowRight}/> Выйти</button>
+            <button className="logout-button" onClick={logout}><FontAwesomeIcon icon={faArrowRight}/> Выход</button>
             </div>
         </header>
     );

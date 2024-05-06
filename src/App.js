@@ -11,6 +11,7 @@ import Home from "./layouts/home/home";
 import Project from "./layouts/project/project";
 import Specialization from "./layouts/specialization/specialization";
 import Users from "./layouts/user/users";
+import UsersReports from "./layouts/users-reports/users-reports";
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
                     <Route path="/account" element={<RequireToken><Header /><Account /></RequireToken>} />
                     <Route path="/users" element={<RequireToken><Header /><Users /></RequireToken>} />
                     <Route path="/specializations" element={<RequireToken><Header /><Specialization /></RequireToken>} />
+                    <Route path="/users-reports" element={<RequireToken><Header /><UsersReports /></RequireToken>} />
                     <Route path="/projects" element={<RequireToken><Header /><Project /></RequireToken>} /> {}
                 </Routes>
             </div>
