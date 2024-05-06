@@ -270,10 +270,10 @@ const Home = () => {
     };
 
     const handleChange = (event) => {
-        const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+        const { name, value } = event.target;
         setFormData({
             ...formData,
-            [event.target.name]: value
+            [name]: value, // Или можно использовать russianDate вместо value, если требуется отображать русское представление даты в UI
         });
     };
 
@@ -294,11 +294,11 @@ const Home = () => {
                             <label>
                                 Часы:
                                 <input type="number" name="hours" value={formData.hours} onChange={handleChange} min="0"
-                                       max="24"/>
+                                       max="16"/>
                             </label>
                             <label>
                                 Описание:
-                                <input type="text" name="comment" value={formData.comment} onChange={handleChange}/>
+                                <textarea name="comment" value={formData.comment} onChange={handleChange}/>
                             </label>
                             <label>
                                 Проект:

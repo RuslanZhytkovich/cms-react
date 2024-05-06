@@ -36,8 +36,9 @@ h2 {
 
 /* Стили для содержимого модального окна */
 .modal-content {
-    width: 500px;
-    height: 250px;
+    margin: 1000px 0; /* Отступы по 10 пикселей сверху и снизу */
+    width: 700px;
+    height: 450px;
     display: flex;
     background-color: #fff; /* Белый фон */
     padding: 20px;
@@ -47,6 +48,7 @@ h2 {
     max-width: 400px; /* Максимальная ширина модального окна */
     align-items: center; /* Выравнивание элементов по центру */
 }
+
 
 .modal-content form {
     display: flex;
@@ -100,4 +102,23 @@ body{
 
 .createbtn:hover {
     transform: scale(1.1);
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content form *:not(button) {
+    margin-left: 6px; /* Отступ к левому краю для всех элементов, кроме кнопки */
+}
+
+.modal-content form button {
+    background: orangered;
+    margin-top: 10px; /* Добавим немного отступа над кнопкой */
+}
+
+.modal-content form textarea {
+    width: 300px;
+    height: 200px;
 }
