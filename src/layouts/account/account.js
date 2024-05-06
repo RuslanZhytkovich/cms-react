@@ -8,6 +8,7 @@ const Account = ({ navigate }) => {
     const [specializations, setSpecializations] = useState([]);
     const [allFieldsFilled, setAllFieldsFilled] = useState(true); // Флаг для проверки заполненности всех полей
 
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -57,20 +58,27 @@ const Account = ({ navigate }) => {
     }, [accessToken]);
 
     useEffect(() => {
-        // Проверяем, что все поля заполнены
+        // Проверяем, что все поля, кроме чекбокса, заполнены
         if (editableUserData) {
             const keys = Object.keys(editableUserData);
             for (const key of keys) {
                 // Если какое-то поле пустое, устанавливаем флаг allFieldsFilled в false и выходим из цикла
-                if (!editableUserData[key]) {
+                if (!editableUserData[key] && key !== 'on_bench') {
                     setAllFieldsFilled(false);
                     return;
                 }
             }
-            // Если все поля заполнены, устанавливаем флаг allFieldsFilled в true
+            // Если чекбокс не имеет значения (не отмечен), считаем его заполненным
+            if (editableUserData['on_bench'] === undefined) {
+                setAllFieldsFilled(false);
+                return;
+            }
+            // Если все поля, кроме чекбокса, заполнены, устанавливаем флаг allFieldsFilled в true
             setAllFieldsFilled(true);
         }
     }, [editableUserData]);
+
+
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -79,24 +87,32 @@ const Account = ({ navigate }) => {
     };
 
     const handleUpdateProfile = async () => {
+        console.log("Данные для отправки на сервер:", editableUserData);
         try {
-            const response = await fetch(`http://127.0.0.1:8000/users/profile/update/${userData.current_user.user_id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`
-                },
-                body: JSON.stringify(editableUserData)
-            });
-            if (response.ok) {
-                alert("Данные успешно обновлены");
+            // Проверяем, что все поля заполнены и чекбокс отмечен
+            if (allFieldsFilled) {
+                const response = await fetch(`http://127.0.0.1:8000/users/profile/update/${userData.current_user.user_id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify(editableUserData)
+                });
+                if (response.ok) {
+                    alert("Данные успешно обновлены");
+                } else {
+                    console.error('Ошибка при обновлении профиля:', response.statusText);
+                }
             } else {
-                console.error('Ошибка при обновлении профиля:', response.statusText);
+                // Показываем сообщение об ошибке, если не все поля заполнены или чекбокс не отмечен
+                alert("Заполните все данные для дальнейшей работы и отметьте чекбокс, если вы находитесь на бенче");
             }
         } catch (error) {
             console.error('Ошибка при выполнении запроса:', error);
         }
     };
+
 
     return (
         <div className="container" style={{marginTop: '10px', height: '930px'}}>
