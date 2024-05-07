@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './account.css';
+import {useNavigate} from "react-router-dom";
 
 const Account = ({ navigate }) => {
     const [userData, setUserData] = useState(null);
@@ -7,7 +8,7 @@ const Account = ({ navigate }) => {
     const [editableUserData, setEditableUserData] = useState(null);
     const [specializations, setSpecializations] = useState([]);
     const [allFieldsFilled, setAllFieldsFilled] = useState(true); // Флаг для проверки заполненности всех полей
-
+    const navigate2 = useNavigate(); // Перемещаем хук за пределы компонента
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -101,6 +102,8 @@ const Account = ({ navigate }) => {
                 });
                 if (response.ok) {
                     alert("Данные успешно обновлены");
+                    navigate2('/home');
+
                 } else {
                     console.error('Ошибка при обновлении профиля:', response.statusText);
                 }
