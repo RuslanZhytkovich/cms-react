@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import './header.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBook, faClock, faFolder, faUser, faPeopleArrows, faAddressCard, faFolderBlank, faArrowRight } from '@fortawesome/free-solid-svg-icons';
@@ -46,13 +46,13 @@ const Header = () => {
         <header className="header-container">
             <nav>
                 <ul className="nav-list">
-                    <li><Link to="/home" style={{ }}><FontAwesomeIcon icon={faClock} /> Мои отчеты</Link></li>
-                    <li><Link to="/account" style={{ }}><FontAwesomeIcon icon={faAddressCard} /> Профиль</Link></li>
-                    <li><Link to="/users" style={{ }}><FontAwesomeIcon icon={faUser} /> Сотрудники</Link></li>
-                    <li><Link to="/projects" style={{ color: linkColor}}><FontAwesomeIcon icon={faFolder} /> Проекты</Link></li>
-                    <li><Link to="/customers" style={{color: linkColor }}><FontAwesomeIcon icon={faPeopleArrows} /> Заказчики</Link></li>
-                    <li><Link to="/specializations" style={{ color: linkColor }}><FontAwesomeIcon icon={faFolder} /> Специализации</Link></li>
-                    <li><Link to="/users-reports" style={{ color: linkColor }}><FontAwesomeIcon icon={faBook} /> Все отчеты</Link></li>
+                    <li><NavLink to="/home" activeClassName="active"><FontAwesomeIcon icon={faClock} /> Мои отчеты</NavLink></li>
+                    <li><NavLink to="/account" activeClassName="active"><FontAwesomeIcon icon={faAddressCard} /> Профиль</NavLink></li>
+                    <li><NavLink to="/users" activeClassName="active"><FontAwesomeIcon icon={faUser} /> Сотрудники</NavLink></li>
+                    <li><NavLink to="/projects" activeClassName="active" className={userRole === "developer" ? "red-link" : ""}><FontAwesomeIcon icon={faFolder} /> Проекты</NavLink></li>
+                    <li><NavLink to="/customers" activeClassName="active" className={userRole === "developer" ? "red-link" : ""}><FontAwesomeIcon icon={faPeopleArrows} /> Заказчики</NavLink></li>
+                    <li><NavLink to="/specializations" activeClassName="active" className={userRole === "developer" ? "red-link" : ""}><FontAwesomeIcon icon={faFolder} /> Специализации</NavLink></li>
+                    <li><NavLink to="/users-reports" activeClassName="active" className={userRole === "developer" ? "red-link" : ""}><FontAwesomeIcon icon={faBook} /> Все отчеты</NavLink></li>
                 </ul>
             </nav>
             <div className="logout-button-container">

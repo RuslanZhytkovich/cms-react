@@ -79,3 +79,18 @@ button:hover {
     width: 500px; /* Ширина поля ввода */
     border-radius: 5px;
 }
+
+
+.nav-list li a {
+    text-decoration: none;
+    color: white; /* Цвет текста пунктов меню */
+}
+
+.nav-list li a.active {
+    color: #ff4500;
+
+}
+
+.red-link {
+    color: darkgray !important; /* Цвет текста для ссылок с классом red-link */
+}
