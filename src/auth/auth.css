@@ -113,3 +113,9 @@ span {
     font-weight: 700;
     cursor: pointer;
 }
+
+.error-message {
+    color: red;
+    margin-top: 40px;
+    text-align: center;
+}

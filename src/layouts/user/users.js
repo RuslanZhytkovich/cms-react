@@ -24,6 +24,7 @@ const Users = () => {
         role: '',
     });
     const [editingUserId, setEditingUserId] = useState(null);
+    const [currentUserRole, setCurrentUserRole] = useState('');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -31,6 +32,7 @@ const Users = () => {
                 const data = await fetchUserData();
                 console.log(data.current_user);
 
+                setCurrentUserRole(data.current_user.role);
                 // Проверяем каждое поле на наличие значения
                 for (const key in data.current_user) {
                     if (key !== 'on_bench' && !data.current_user[key]) {
@@ -45,7 +47,7 @@ const Users = () => {
         };
 
         fetchData();
-    }, []);
+    }, [navigate]);
 
     useEffect(() => {
         const fetchAccessToken = async () => {
@@ -204,8 +206,8 @@ const Users = () => {
                                 Роль:
                                 <select name="role" value={formData.role} onChange={handleChange}>
                                     <option value="">Выберите роль</option>
-                                    <option value="admin">Менеджер</option>
-                                    <option value="manager">Администратор</option>
+                                    <option value="admin">Администратор</option>
+                                    <option value="manager">Менеджер</option>
                                     <option value="developer">Разработчик</option>
                                 </select>
                             </label>
@@ -230,7 +232,6 @@ const Users = () => {
                                 onClick={clearSearch}
                                 style={{ marginLeft: '-20px', top: '50%'}}
                             />
-
                         )}
                         <FontAwesomeIcon
                             className="icon"
@@ -266,8 +267,8 @@ const Users = () => {
                         header="Статус"
                         body={(rowData) => (
                             <span style={{ color: rowData.on_bench ? "red" : "black" }}>
-                {rowData.on_bench ? "Без проекта" : "На проекте"}
-            </span>
+                                {rowData.on_bench ? "Без проекта" : "На проекте"}
+                            </span>
                         )}
                         sortable
                         sortField="on_bench"
@@ -278,18 +279,20 @@ const Users = () => {
                         sortable
                         body={(rowData) => `${specializationNames[rowData.user_id]}`}
                     />
-                    <Column
-                        header="Действие"
-                        body={(rowData) => (
-                            <span className="icon-container">
-                <FontAwesomeIcon
-                    className="icon"
-                    icon={faPenSquare}
-                    onClick={() => handleEditUser(rowData.user_id)}
-                />
-            </span>
-                        )}
-                    />
+                    {currentUserRole !== 'developer' && (
+                        <Column
+                            header="Действие"
+                            body={(rowData) => (
+                                <span className="icon-container">
+                                    <FontAwesomeIcon
+                                        className="icon"
+                                        icon={faPenSquare}
+                                        onClick={() => handleEditUser(rowData.user_id)}
+                                    />
+                                </span>
+                            )}
+                        />
+                    )}
                 </DataTable>
             </div>
         </div>

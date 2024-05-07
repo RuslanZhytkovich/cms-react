@@ -3,7 +3,7 @@ import { setAccessTokenToLocalStorage, setRefreshTokenToCookie } from "./Auth";
 import { useNavigate } from "react-router-dom";
 import password_icon from "../assets/password.png";
 import email_icon from "../assets/email.png";
-import  "./auth.css";
+import "./auth.css";
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -12,6 +12,8 @@ const Login = () => {
     });
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
+    const [errorMessage, setErrorMessage] = useState('');
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -20,6 +22,7 @@ const Login = () => {
         });
 
         setErrors({});
+        setErrorMessage('');
     };
 
     const handleRegisterClick = () => {
@@ -61,12 +64,14 @@ const Login = () => {
                 const data = await response.json();
 
                 if (!response.ok) {
-                    console.log("11111_" + response.status)
-                    console.log('not ok(')
+                    if (response.status === 401) {
+                        setErrorMessage("Неверный логин или пароль");
+                    } else {
+                        setErrorMessage(`Ошибка ${response.status}`);
+                    }
                 } else {
                     setRefreshTokenToCookie(data['refresh_token']);
                     setAccessTokenToLocalStorage(data['access_token'])
-
                     navigate('/home');
                 }
             } catch (error) {
@@ -82,9 +87,10 @@ const Login = () => {
                 <div className="text">Вход в систему</div>
                 <div className="underline"></div>
             </div>
+            {errorMessage && <div className="error-message">{errorMessage}</div>}
             <div className="inputs">
                 <div className="input">
-                    <img src={email_icon} alt=""/>
+                    <img src={email_icon} alt="" />
                     <input
                         name="email"
                         placeholder='Email'
@@ -95,7 +101,7 @@ const Login = () => {
                     {errors.email && <span>{errors.email}</span>}
                 </div>
                 <div className="input">
-                    <img src={password_icon} alt=""/>
+                    <img src={password_icon} alt="" />
                     <input
                         type="password"
                         name="password"
@@ -105,7 +111,7 @@ const Login = () => {
                     {errors.password && <span>{errors.password}</span>}
                 </div>
             </div>
-            <div className="forgot-password">Еще не зарегестрированы? <span onClick={handleRegisterClick}> Зарегестрироваться!</span></div>
+            <div className="forgot-password">Еще не зарегистрированы? <span onClick={handleRegisterClick}> Зарегистрироваться!</span></div>
             <div className="submit-container">
                 <button type="button" className="submit" onClick={handleSubmit}>Подтвердить</button>
             </div>

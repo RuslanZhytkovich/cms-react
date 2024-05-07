@@ -47,7 +47,7 @@ function App() {
                     <Route path="/account" element={<RequireToken><Header userRole={userRole} /><Account /></RequireToken>} />
                     <Route path="/users" element={<RequireToken><Header userRole={userRole} /><Users /></RequireToken>} />
                     <Route path="/specializations" element={<RequireToken><RequireRole><Header userRole={userRole} /><Specialization /></RequireRole></RequireToken>} />
-                    <Route path="/users-reports" element={<RequireToken><RequireRole><Header userRole={userRole} /><UsersReports /></RequireRole></RequireToken>} />
+                    <Route path="/users-reports" element={<RequireToken><Header userRole={userRole} /><UsersReports /></RequireToken>} />
                     <Route path="/projects" element={<RequireToken><RequireRole><Header userRole={userRole} /><Project /></RequireRole></RequireToken>} />
                 </Routes>
             </div>
