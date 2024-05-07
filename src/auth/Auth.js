@@ -84,20 +84,23 @@ export function RequireToken({ children }) {
     return children;
 }
 
-
-export function RequireRole({ children }) {
+export const RequireRole = ({ children }) => {
     const [auth, setAuth] = useState(null);
+    const [userRole, setUserRole] = useState(null);
     const location = useLocation();
     const navigate = useNavigate();
-    const [userRole, setUserRole] = useState(null);
-    const alertShown = useRef(false); // useRef для отслеживания вызова alert
+    const alertShown = useRef(false);
 
     useEffect(() => {
-        const fetchAuth = async () => {
-            const isAuthenticated = await fetchToken();
-            setAuth(isAuthenticated);
+        const fetchData = async () => {
+            try {
+                const isAuthenticated = await fetchToken();
+                setAuth(isAuthenticated);
+            } catch (error) {
+                console.error(error.message);
+            }
         };
-        fetchAuth();
+        fetchData();
     }, []);
 
     useEffect(() => {
@@ -106,27 +109,30 @@ export function RequireRole({ children }) {
                 const data = await fetchUserData();
                 const role = data['current_user'].role;
                 setUserRole(role);
-                console.log(role);
             } catch (error) {
                 console.error(error.message);
             }
         };
-        fetchData();
-    }, []);
+        if (auth) {
+            fetchData();
+        }
+    }, [auth]);
 
+    useEffect(() => {
+        if (userRole === "developer" && !alertShown.current) {
+            alertShown.current = true;
+            navigate('/home');
+            alert('Только для администраторов и менеджеров!');
+        }
+    }, [userRole]);
 
-
-    if (auth === null) {
+    if (auth === null || userRole === null) {
         return <div>Loading...</div>;
     }
 
-    if (userRole === "developer" && !alertShown.current) {
-        alertShown.current = true;
-        navigate('/home');
-        alert('Запрещено в доступе!');
-    }
-
     return children;
-}
+};
+
+
 
 

@@ -43,11 +43,11 @@ function App() {
 
                     {/* 3. Передаем userRole в компонент Header */}
                     <Route path="/home" element={<RequireToken><Header userRole={userRole} /><Home /></RequireToken>} />
-                    <Route path="/customers" element={<RequireToken><RequireRole><Header userRole={userRole} /><Customer /></RequireRole></RequireToken>} />
                     <Route path="/account" element={<RequireToken><Header userRole={userRole} /><Account /></RequireToken>} />
                     <Route path="/users" element={<RequireToken><Header userRole={userRole} /><Users /></RequireToken>} />
+                    <Route path="/customers" element={<RequireToken><RequireRole><Header userRole={userRole} /><Customer /></RequireRole></RequireToken>} />
                     <Route path="/specializations" element={<RequireToken><RequireRole><Header userRole={userRole} /><Specialization /></RequireRole></RequireToken>} />
-                    <Route path="/users-reports" element={<RequireToken><Header userRole={userRole} /><UsersReports /></RequireToken>} />
+                    <Route path="/users-reports" element={<RequireToken><RequireRole><Header userRole={userRole} /><UsersReports /></RequireRole></RequireToken>} />
                     <Route path="/projects" element={<RequireToken><RequireRole><Header userRole={userRole} /><Project /></RequireRole></RequireToken>} />
                 </Routes>
             </div>
