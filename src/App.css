@@ -35,7 +35,7 @@ h2 {
 }
 
 /* Стили для содержимого модального окна */
-.modal-content {
+.modal-content-b {
     margin: 1000px 0; /* Отступы по 10 пикселей сверху и снизу */
     width: 700px;
     height: 450px;
@@ -50,7 +50,7 @@ h2 {
 }
 
 
-.modal-content form {
+.modal-content-b form {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -104,6 +104,26 @@ body{
     transform: scale(1.1);
 }
 
+.modal-content-b form {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content-b form *:not(button) {
+    margin-left: 6px; /* Отступ к левому краю для всех элементов, кроме кнопки */
+}
+
+.modal-content-b form button {
+    background: orangered;
+    margin-top: 10px; /* Добавим немного отступа над кнопкой */
+}
+
+.modal-content-b form textarea {
+    width: 300px;
+    height: 200px;
+}
+
+
 .modal-content form {
     display: flex;
     flex-direction: column;
@@ -121,4 +141,29 @@ body{
 .modal-content form textarea {
     width: 300px;
     height: 200px;
+}
+
+
+
+/* Стили для содержимого модального окна */
+.modal-content {
+    margin: 1000px 0; /* Отступы по 10 пикселей сверху и снизу */
+    width: 700px;
+    height: 450px;
+    display: flex;
+    background-color: #fff; /* Белый фон */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2); /* Тень для эффекта всплывания */
+    flex-direction: column; /* Расположение элементов в столбик */
+    max-width: 400px; /* Максимальная ширина модального окна */
+    align-items: center; /* Выравнивание элементов по центру */
+}
+
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
 }

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faTrash, faPenSquare, faPlus, faMagnifyingGlass, faTimes} from '@fortawesome/free-solid-svg-icons';
-import Modal from "../../components/modal";
 import "../../App.css";
 import {InputText} from "primereact/inputtext";
 import {FilterMatchMode} from "primereact/api";
@@ -11,6 +10,25 @@ import "primereact/resources/themes/lara-light-indigo/theme.css"
 import "primereact/resources/primereact.min.css"
 import {fetchUserData} from "../../utils/profile-info";
 import {useNavigate} from "react-router-dom";
+
+
+const Modal = ({ children, closeModal }) => {
+    const handleModalClick = (e) => {
+        if (e.target === e.currentTarget) {
+            closeModal();
+        }
+    };
+
+    return (
+        <div className="modal" onClick={handleModalClick}>
+            <div className="modal-content-b">
+                <span className="close" onClick={closeModal}>&times;</span>
+                {children}
+            </div>
+        </div>
+    );
+};
+
 
 
 const Home = () => {

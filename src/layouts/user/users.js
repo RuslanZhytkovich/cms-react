@@ -9,6 +9,7 @@ import { InputText } from "primereact/inputtext";
 import { useNavigate } from "react-router-dom";
 import { fetchUserData } from "../../utils/profile-info";
 import "../../App.css";
+import "./user.css"
 
 const Users = () => {
     const navigate = useNavigate();
@@ -165,6 +166,7 @@ const Users = () => {
                 cancelEditUser();
                 window.location.reload();
             } else {
+                alert("Недостаточно прав")
                 console.error('Ошибка при обновлении пользователя:', response.statusText);
             }
         } catch (error) {
@@ -200,8 +202,8 @@ const Users = () => {
         <div>
             <div className="datatable">
                 {showModal && (
-                    <Modal closeModal={handleCloseModal}>
-                        <form onSubmit={handleSubmit}>
+                    <Modal closeModal={handleCloseModal} >
+                        <form onSubmit={handleSubmit} >
                             <label>
                                 Роль:
                                 <select name="role" value={formData.role} onChange={handleChange}>
